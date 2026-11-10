@@ -4,18 +4,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeVault - User Registration</title>
+    <title>SafeVault - Secure Registration</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 32px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #38bdf8;
+        }
+        p.subtitle {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+        input {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #38bdf8;
+        }
+        .hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: -10px;
+        }
+        button {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 8px;
+        }
+        button:hover {
+            background-color: #0369a1;
+        }
+        .message-box {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            display: none;
+        }
+        .message-box.success {
+            background-color: #064e3b;
+            color: #6ee7b7;
+            border: 1px solid #059669;
+        }
+        .message-box.error {
+            background-color: #450a0a;
+            color: #fca5a5;
+            border: 1px solid #dc2626;
+        }
+    </style>
 </head>
 <body>
-    <h2>SafeVault User Form</h2>
-    <form action="/submit" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
+    <div class="container">
+        <h1>SafeVault</h1>
+        <p class="subtitle">Secure Input Validation and Parameterized Registration</p>
         
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email">
-        
-        <button type="submit">Submit</button>
-    </form>
+        <form id="vaultForm" action="/submit" method="post">
+            <label for="username">Username:</label>
+            <input type="text"
+                   id="username"
+                   name="username"
+                   required
+                   minlength="3"
+                   maxlength="50"
+                   pattern="[a-zA-Z0-9_\-\.]{3,50}"
+                   title="Username must be 3-50 alphanumeric characters, underscores, hyphens, or periods."
+                   autocomplete="username">
+            <span class="hint">Allowed: alphanumeric, _, -, . (3-50 characters)</span>
+            
+            <label for="email">Email:</label>
+            <input type="email"
+                   id="email"
+                   name="email"
+                   required
+                   maxlength="100"
+                   autocomplete="email">
+            <span class="hint">Valid email format required (max 100 characters)</span>
+            
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="statusMessage" class="message-box" role="alert"></div>
+    </div>
+
+    <script>
+        function sanitizeInput(value) {
+            if (!value) return '';
+            return value
+                .replace(/<[^>]*>/g, '')
+                .replace(/javascript:/gi, '')
+                .replace(/on\w+=/gi, '')
+                .trim();
+        }
+
+        document.getElementById('vaultForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const messageBox = document.getElementById('statusMessage');
+            messageBox.style.display = 'none';
+
+            const rawUsername = document.getElementById('username').value;
+            const rawEmail = document.getElementById('email').value;
+
+            const sanitizedUsername = sanitizeInput(rawUsername);
+            const sanitizedEmail = sanitizeInput(rawEmail);
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: sanitizedUsername, email: sanitizedEmail })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    messageBox.className = 'message-box success';
+                    messageBox.textContent = data.message || 'User registered successfully with validated input.';
+                } else {
+                    messageBox.className = 'message-box error';
+                    messageBox.textContent = (data.errors && data.errors.join(', ')) || data.message || 'Submission validation failed.';
+                }
+            } catch (err) {
+                messageBox.className = 'message-box error';
+                messageBox.textContent = 'Connection error. Please try again.';
+            }
+            messageBox.style.display = 'block';
+        });
+    </script>
 </body>
 </html>
