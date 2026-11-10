@@ -1,23 +1,34 @@
+using System.Data;
 using Microsoft.Data.Sqlite;
 using SafeVault.Models;
 
 namespace SafeVault.Data;
 
-public class UserRepository
+public class UserRepository : IDisposable
 {
-    private readonly string _connectionString;
+    private readonly SqliteConnection _connection;
+    private readonly bool _ownsConnection;
 
     public UserRepository(string connectionString = "Data Source=safevault.db")
     {
-        _connectionString = connectionString;
+        _connection = new SqliteConnection(connectionString);
+        _connection.Open();
+        _ownsConnection = true;
+    }
+
+    public UserRepository(SqliteConnection connection)
+    {
+        _connection = connection;
+        if (_connection.State != ConnectionState.Open)
+        {
+            _connection.Open();
+        }
+        _ownsConnection = false;
     }
 
     public void InitializeSchema()
     {
-        using var connection = new SqliteConnection(_connectionString);
-        connection.Open();
-
-        using var command = connection.CreateCommand();
+        using var command = _connection.CreateCommand();
         command.CommandText = @"
             CREATE TABLE IF NOT EXISTS Users (
                 UserID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,11 +40,8 @@ public class UserRepository
 
     public async Task<int> CreateUserAsync(string username, string email)
     {
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.OpenAsync();
-
-        using var command = connection.CreateCommand();
-        // Parameterized query using placeholders prevents SQL injection
+        using var command = _connection.CreateCommand();
+        // Parameterized query: inputs are bound as parameters, preventing SQL injection
         command.CommandText = @"
             INSERT INTO Users (Username, Email) 
             VALUES (@Username, @Email);
@@ -48,11 +56,8 @@ public class UserRepository
 
     public async Task<UserRecord?> GetUserByUsernameAsync(string username)
     {
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.OpenAsync();
-
-        using var command = connection.CreateCommand();
-        // Parameterized query: user input is bound to parameter and never concatenated
+        using var command = _connection.CreateCommand();
+        // Parameterized query: input is strictly treated as a literal value
         command.CommandText = @"
             SELECT UserID, Username, Email 
             FROM Users 
@@ -77,10 +82,7 @@ public class UserRepository
     public async Task<IReadOnlyList<UserRecord>> GetAllUsersAsync()
     {
         var users = new List<UserRecord>();
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.OpenAsync();
-
-        using var command = connection.CreateCommand();
+        using var command = _connection.CreateCommand();
         command.CommandText = "SELECT UserID, Username, Email FROM Users ORDER BY UserID ASC;";
 
         using var reader = await command.ExecuteReaderAsync();
@@ -98,10 +100,7 @@ public class UserRepository
 
     public bool TableExists(string tableName)
     {
-        using var connection = new SqliteConnection(_connectionString);
-        connection.Open();
-
-        using var command = connection.CreateCommand();
+        using var command = _connection.CreateCommand();
         command.CommandText = @"
             SELECT COUNT(*) 
             FROM sqlite_master 
@@ -110,5 +109,13 @@ public class UserRepository
 
         var count = Convert.ToInt32(command.ExecuteScalar());
         return count > 0;
+    }
+
+    public void Dispose()
+    {
+        if (_ownsConnection)
+        {
+            _connection.Dispose();
+        }
     }
 }
