@@ -24,6 +24,14 @@ SafeVault demonstrates defense-in-depth secure coding principles, focusing on th
   - `TestForSQLInjection()`: Simulates SQL injection attempts (tautologies, stacked queries, inline comments, union attacks) against the data access layer, verifying that parameters are strictly treated as data and table integrity remains uncompromised.
   - `TestForXSS()`: Simulates script injection and malicious event handler attributes, verifying that the sanitization engine reliably neutralizes executable code.
 
+### 4. WCAG 2.1 Accessibility & Interactive Task Guidance
+- **WCAG 2.1 Compliant Interface**: Redesigned UI featuring comfortable typography (>= 16px body/inputs, >= 14.5px code), generous line-heights, 44px+ touch targets, and high contrast ratios (>= 12:1) meeting WCAG 2.1 AAA standards.
+- **Guided Task Missions**: Dedicated onboarding panel providing visitors with 4 step-by-step interactive verification cycles:
+  1. *Cycle 1 — Legitimate Registration*: Verify valid input constraints and parameter binding.
+  2. *Cycle 2 — SQL Injection Neutralization*: Execute tautologies and stacked drops to observe parameterized query protection.
+  3. *Cycle 3 — XSS Defense*: Submit executable payloads to observe client/server HTML entity sanitization.
+  4. *Cycle 4 — Automated Test Verification*: Run the full 8-point security suite directly in-browser or via the .NET CLI.
+
 ---
 
 ## Project Structure
@@ -33,6 +41,7 @@ SafeVault demonstrates defense-in-depth secure coding principles, focusing on th
 ├── README.md
 ├── SafeVault.sln
 ├── database.sql
+├── index.html
 ├── webform.html
 ├── src/
 │   └── SafeVault/
