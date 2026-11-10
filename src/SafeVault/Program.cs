@@ -19,13 +19,17 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Serve webform.html at root if not caught by static files
+// Serve index.html or webform.html at root
 app.MapGet("/", async context =>
 {
-    var htmlPath = Path.Combine(app.Environment.ContentRootPath, "../../webform.html");
+    var htmlPath = Path.Combine(app.Environment.ContentRootPath, "../../index.html");
     if (!File.Exists(htmlPath))
     {
-        htmlPath = Path.Combine(AppContext.BaseDirectory, "webform.html");
+        htmlPath = Path.Combine(app.Environment.ContentRootPath, "../../webform.html");
+    }
+    if (!File.Exists(htmlPath))
+    {
+        htmlPath = Path.Combine(AppContext.BaseDirectory, "index.html");
     }
     if (File.Exists(htmlPath))
     {
@@ -36,6 +40,20 @@ app.MapGet("/", async context =>
     {
         context.Response.StatusCode = 200;
         await context.Response.WriteAsync("SafeVault API is running.");
+    }
+});
+
+app.MapGet("/webform.html", async context =>
+{
+    var htmlPath = Path.Combine(app.Environment.ContentRootPath, "../../webform.html");
+    if (File.Exists(htmlPath))
+    {
+        context.Response.ContentType = "text/html; charset=utf-8";
+        await context.Response.SendFileAsync(htmlPath);
+    }
+    else
+    {
+        context.Response.StatusCode = 404;
     }
 });
 

@@ -4,6 +4,9 @@ A secure web application designed to manage sensitive user data and credentials,
 
 SafeVault demonstrates defense-in-depth secure coding principles, focusing on the mitigation of common web application vulnerabilities including SQL Injection (SQLi) and Cross-Site Scripting (XSS).
 
+**Live Interactive Deployment:** [https://jdsaire.github.io/fullstack_c8_safevault/](https://jdsaire.github.io/fullstack_c8_safevault/)  
+*(Interact with the real-time input validation pipeline, parameterized SQL query inspector, and vulnerability attack simulator directly in your browser).*
+
 ---
 
 ## Architecture & Security Implementation
