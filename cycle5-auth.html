@@ -67,7 +67,7 @@
                             <label for="regUsername" class="form-label">
                                 <span>Username <span class="req" aria-hidden="true">*</span></span>
                             </label>
-                            <input type="text" id="regUsername" class="form-control" required value="david_ops" placeholder="e.g. david_ops">
+                            <input type="text" id="regUsername" class="form-control" required placeholder="e.g. david_ops">
                         </div>
 
                         <div class="form-group">
@@ -86,7 +86,7 @@
                         <label for="regEmail" class="form-label">
                             <span>Email Address <span class="req" aria-hidden="true">*</span></span>
                         </label>
-                        <input type="email" id="regEmail" class="form-control" required value="david@safevault.local">
+                        <input type="email" id="regEmail" class="form-control" required placeholder="e.g. david@safevault.local">
                     </div>
 
                     <div class="form-group">
@@ -94,7 +94,7 @@
                             <span>Plaintext Password <span class="req" aria-hidden="true">*</span></span>
                             <span class="char-count">Min 8 chars, letter + digit</span>
                         </label>
-                        <input type="text" id="regPassword" class="form-control" required value="VaultSecret#2026!" style="font-family: var(--font-mono);">
+                        <input type="text" id="regPassword" class="form-control" required placeholder="e.g. VaultSecret#2026!" style="font-family: var(--font-mono);">
                         <p class="form-hint">Never stored in plaintext. Immediately hashed with a fresh 128-bit cryptographic salt.</p>
                     </div>
 
@@ -114,26 +114,26 @@
                         <span style="font-size: 13.5px; font-weight: 700; color: var(--color-primary); text-transform: uppercase;">
                             Generated 60-Char BCrypt Modular Crypt String:
                         </span>
-                        <span style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="hashLengthBadge">60 chars</span>
+                        <span style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="hashLengthBadge">Idle</span>
                     </div>
-                    <div class="step-output" id="fullBcryptOutput" style="color: #6ee7b7; font-weight: 700; margin-bottom: 10px;">$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW</div>
+                    <div class="step-output" id="fullBcryptOutput" style="color: #6ee7b7; font-weight: 700; margin-bottom: 10px;">// Awaiting form submission...</div>
 
                     <div class="hash-dissector">
                         <div class="hash-segment">
                             <span class="hash-segment-label">Algorithm ID</span>
-                            <span class="hash-segment-value" style="color: #38bdf8;" id="dissectAlgo">$2a$ (BCrypt)</span>
+                            <span class="hash-segment-value" style="color: #38bdf8;" id="dissectAlgo">—</span>
                         </div>
                         <div class="hash-segment">
                             <span class="hash-segment-label">Cost Factor</span>
-                            <span class="hash-segment-value" style="color: #c084fc;" id="dissectCost">12 (4,096 rounds)</span>
+                            <span class="hash-segment-value" style="color: #c084fc;" id="dissectCost">—</span>
                         </div>
                         <div class="hash-segment">
                             <span class="hash-segment-label">128-Bit Salt (22 chars)</span>
-                            <span class="hash-segment-value" style="color: #fbbf24;" id="dissectSalt">R9h/cIPz0gi.URNNX3kh2O</span>
+                            <span class="hash-segment-value" style="color: #fbbf24;" id="dissectSalt">—</span>
                         </div>
                         <div class="hash-segment">
                             <span class="hash-segment-label">Cipher Digest (31 chars)</span>
-                            <span class="hash-segment-value" style="color: #34d399;" id="dissectCipher">PST9/PgBkqquzi.Ss7KIUgO2t0jWMUW</span>
+                            <span class="hash-segment-value" style="color: #34d399;" id="dissectCipher">—</span>
                         </div>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
                     <h2 class="card-title" id="loginSimTitle">
                         <span aria-hidden="true">🛡️</span> Login Authentication & Attack Simulator
                     </h2>
-                    <span class="http-badge http-200" id="loginHttpBadge">200 OK</span>
+                    <span class="telemetry-status" id="loginHttpBadge">Idle</span>
                 </div>
 
                 <!-- Login Scenario Presets -->
@@ -168,13 +168,13 @@
                             <label for="loginUsername" class="form-label">
                                 <span>Login Username <span class="req" aria-hidden="true">*</span></span>
                             </label>
-                            <input type="text" id="loginUsername" class="form-control" required value="admin_vault" style="font-family: var(--font-mono);">
+                            <input type="text" id="loginUsername" class="form-control" required placeholder="e.g. admin_vault" style="font-family: var(--font-mono);">
                         </div>
                         <div class="form-group">
                             <label for="loginPassword" class="form-label">
                                 <span>Candidate Password <span class="req" aria-hidden="true">*</span></span>
                             </label>
-                            <input type="text" id="loginPassword" class="form-control" required value="AdminVault#2026" style="font-family: var(--font-mono);">
+                            <input type="text" id="loginPassword" class="form-control" required placeholder="e.g. AdminVault#2026" style="font-family: var(--font-mono);">
                         </div>
                     </div>
 
@@ -190,7 +190,7 @@
                             <span class="step-name">Step 1: Parameterized User Account Lookup</span>
                             <span class="step-method">UserRepository.cs</span>
                         </div>
-                        <div class="step-output" id="authStepLookup">// Ready to execute parameterized lookup...</div>
+                        <div class="step-output" id="authStepLookup">// Awaiting form submission...</div>
                     </div>
 
                     <div class="pipeline-step">
@@ -198,7 +198,7 @@
                             <span class="step-name">Step 2: Constant-Time BCrypt Digest Verification</span>
                             <span class="step-method">PasswordHasher.VerifyPassword()</span>
                         </div>
-                        <div class="step-output" id="authStepVerify">// Ready to verify BCrypt salt and digest...</div>
+                        <div class="step-output" id="authStepVerify">// Awaiting form submission...</div>
                     </div>
 
                     <div class="pipeline-step">
@@ -206,7 +206,7 @@
                             <span class="step-name">Step 3: Session Token & Role Claim Issuance</span>
                             <span class="step-method">AuthorizationService.cs</span>
                         </div>
-                        <div class="step-output" id="authStepToken">// Session token output...</div>
+                        <div class="step-output" id="authStepToken">// Awaiting form submission...</div>
                     </div>
                 </div>
             </section>
@@ -248,8 +248,8 @@
                 <div class="telemetry-header">
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Cycle 5 Telemetry & Authentication Code Inspector</h3>
-                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Idle</span>
                     </div>
                     <div class="telemetry-actions">
                         <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
@@ -259,13 +259,12 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Target: <strong id="telemetryTarget">Cycle 5 Authentication</strong></span>
+                        <span>Status: <strong id="telemetryTarget">—</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
                         <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// Execute a registration, salt uniqueness check, or login verification above
-// to inspect the C# BCrypt.Net-Next and parameterized authentication trace.</code></pre>
+                        <pre><code id="telemetryCode">// Awaiting form submission...</code></pre>
                     </div>
                 </div>
             </div>
@@ -337,13 +336,17 @@
         function runLoginPreset(username, password) {
             document.getElementById('loginUsername').value = username;
             document.getElementById('loginPassword').value = password;
-            handleLoginSubmit();
+            SafeVault.showToast('Loaded login preset into form. Click Verify Credentials to submit.', 'success');
         }
 
         async function handleLoginSubmit(e) {
             if (e) e.preventDefault();
-            const u = document.getElementById('loginUsername').value;
+            const u = document.getElementById('loginUsername').value.trim();
             const p = document.getElementById('loginPassword').value;
+            if (!u || !p) {
+                SafeVault.showToast('Please enter or select login credentials before submitting.', 'warning');
+                return;
+            }
 
             const res = await SafeVault.authenticateLogin(u, p);
             const badge = document.getElementById('loginHttpBadge');
@@ -378,7 +381,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             SafeVault.renderAuthUserTable();
-            handleLoginSubmit();
         });
     </script>
 </body>
