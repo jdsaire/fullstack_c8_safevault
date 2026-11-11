@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeVault · Cycle 7: Security Debugging &amp; Remediation Audit</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activities 1–3 Complete</span>
+            </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+                <a href="cycle5-auth.html" class="nav-link">Cycle 5: Auth</a>
+                <a href="cycle6-rbac.html" class="nav-link">Cycle 6: RBAC</a>
+                <a href="cycle7-debug.html" class="nav-link active" aria-current="page">Cycle 7: Debug</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">🔍</span> Cycle 7 · Activity 3 Security Vulnerability Debugging &amp; Remediation
+            </div>
+            <h1 class="hero-title">Vulnerability Remediation Audit &amp; Parameterized Search Inspector</h1>
+            <p class="hero-subtitle">
+                Audit and probe the 4 codebase vulnerabilities identified and patched in Activity 3 (<code>V1</code>–<code>V4</code> badged <code>Identified in Codebase [M]</code>) alongside the 2 simulated baseline patterns (<code>S1</code>–<code>S2</code> badged <code>Simulated Exercise Baseline [SIM]</code>), and test wildcard-safe parameterized user search (<code>LIKE @SearchPattern ESCAPE '\'</code>).
+            </p>
+        </header>
+
+        <!-- Two-Column Workspace -->
+        <div class="workspace-grid">
+
+            <!-- Left Card: Interactive Vulnerability & Remediation Probe Simulator -->
+            <section class="card" aria-labelledby="probeCardTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="probeCardTitle">
+                        <span aria-hidden="true">🛠️</span> Vulnerability &amp; Remediation Probe Simulator
+                    </h2>
+                    <span id="probeProvenanceBadge" class="provenance-badge measured">Identified in Codebase [M]</span>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <span style="display: block; font-size: 13.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                        Select Vulnerability Vector Preset ([M] Measured vs [SIM] Simulated):
+                    </span>
+                    <div class="preset-group" style="margin-bottom: 12px;">
+                        <button type="button" class="preset-pill active" id="presetV1Email" onclick="selectProbePreset('email', '<script>@evil.com', 'presetV1Email')">
+                            V1: Email XSS &lt;script&gt;@evil.com [M]
+                        </button>
+                        <button type="button" class="preset-pill" id="presetV1Xss" onclick="selectProbePreset('xss', '<div onmouseover=alert(1)><a href=&quot;java\tscript:alert(1)&quot;>hover</a></div>', 'presetV1Xss')">
+                            V1: Obfuscated on*= &amp; Protocol XSS [M]
+                        </button>
+                        <button type="button" class="preset-pill" id="presetV2Search" onclick="selectProbePreset('search', '%', 'presetV2Search')">
+                            V2: Wildcard '%' Search Dump [M]
+                        </button>
+                        <button type="button" class="preset-pill" id="presetV3Token" onclick="selectProbePreset('token', 'alice|Admin|9999999999', 'presetV3Token')">
+                            V3: Token Pipe '|' Claim Escalation [M]
+                        </button>
+                        <button type="button" class="preset-pill" id="presetS1Sqli" onclick="selectProbePreset('sqli', '\' OR \'1\'=\'1', 'presetS1Sqli')">
+                            S1: SQL Concatenation vs SqliteParameter [SIM]
+                        </button>
+                        <button type="button" class="preset-pill" id="presetS2Dom" onclick="selectProbePreset('xss', '<svg onload=alert(document.cookie)>', 'presetS2Dom')">
+                            S2: Unescaped innerHTML vs HtmlEncode [SIM]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="probeVectorSelect" class="form-label">
+                        <span>Target Defense Surface</span>
+                    </label>
+                    <select id="probeVectorSelect" class="form-control" onchange="executeCurrentProbe()">
+                        <option value="email">V1 [M] · Strict Email Regex &amp; Disallowed Character Guard</option>
+                        <option value="xss">V1/S2 [M/SIM] · Control-Char, Event-Handler &amp; URI Sanitizer</option>
+                        <option value="search">V2 [M] · Parameterized Search with ESCAPE '\' Wildcard Guard</option>
+                        <option value="token">V3 [M] · HMAC Token Pipe '|' Delimiter &amp; Claim Integrity Guard</option>
+                        <option value="sqli">S1 [SIM] · Parameterized SQLite Query vs String Concatenation</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="probePayloadInput" class="form-label">
+                        <span>Attack or Boundary Payload</span>
+                        <span class="char-count" id="probeVerdictTag" style="color: #34d399;">Attack Blocked</span>
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="probePayloadInput" class="form-control" value="<script>@evil.com" aria-label="Attack payload to probe">
+                        <button type="button" class="btn btn-primary" onclick="executeCurrentProbe()">
+                            Execute Probe
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Side-by-Side Vulnerable vs Remediated Code Comparison -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #fca5a5; text-transform: uppercase;">
+                            ❌ Vulnerable Pattern (Pre-Remediation / Simulated Baseline)
+                        </span>
+                    </div>
+                    <div class="diff-box vulnerable" id="vulnerableCodeBox"></div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #6ee7b7; text-transform: uppercase;">
+                            ✓ Remediated SafeVault Implementation (Activity 3 Patch)
+                        </span>
+                    </div>
+                    <div class="diff-box remediated" id="remediatedCodeBox"></div>
+
+                    <div class="pipeline-step" style="margin-bottom: 0;">
+                        <div class="step-header">
+                            <span class="step-name">Remediation Verdict &amp; Sanitized/Bound Output</span>
+                            <span class="http-badge http-200" id="probeStatusBadge">BLOCKED &amp; NEUTRALIZED</span>
+                        </div>
+                        <div style="font-size: 14.5px; color: var(--text-primary); margin-bottom: 6px;" id="probeVerdictText"></div>
+                        <div style="font-family: var(--font-mono); font-size: 13px; color: var(--color-primary);" id="probeBoundOutput"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Card: Live Parameterized User Directory Search Inspector -->
+            <section class="card" aria-labelledby="searchCardTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="searchCardTitle">
+                        <span aria-hidden="true">🔎</span> Parameterized Directory Search (<code>ESCAPE '\'</code>)
+                    </h2>
+                    <span class="brand-badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                        GET /api/users/search
+                    </span>
+                </div>
+
+                <p style="font-size: 14.5px; color: var(--text-secondary); margin-bottom: 14px;">
+                    Test the Activity 3 parameterized user directory search endpoint (<code>UserRepository.SearchUsersAsync</code>). Wildcards (<code>%</code>, <code>_</code>, <code>\</code>) are escaped via <code>InputValidator.EscapeSqlLikeWildcards()</code> before binding <code>@SearchPattern</code>.
+                </p>
+
+                <div style="margin-bottom: 14px;">
+                    <span style="display: block; font-size: 13.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                        Quick Search &amp; Attack Presets:
+                    </span>
+                    <div class="preset-group" style="margin-bottom: 12px;">
+                        <button type="button" class="preset-pill" onclick="runDirectorySearch('alice')">
+                            Search "alice" (Legitimate)
+                        </button>
+                        <button type="button" class="preset-pill" onclick="runDirectorySearch('audit')">
+                            Search "audit" (Legitimate)
+                        </button>
+                        <button type="button" class="preset-pill" onclick="runDirectorySearch('%')">
+                            Wildcard Dump Probe "%"
+                        </button>
+                        <button type="button" class="preset-pill" onclick="runDirectorySearch('\' OR \'1\'=\'1')">
+                            SQLi Tautology "' OR '1'='1"
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="directorySearchInput" class="form-label">
+                        <span>Search Username or Email Substring</span>
+                        <span class="char-count" id="searchMatchCountBadge">1 row matched</span>
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="directorySearchInput" class="form-control" value="alice" aria-label="Search username or email">
+                        <button type="button" class="btn btn-primary" onclick="runDirectorySearch()">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Parameter Binding Readout -->
+                <div class="hash-dissector" style="margin-bottom: 18px;">
+                    <div class="hash-segment">
+                        <span class="hash-segment-label">Raw Search Input</span>
+                        <span class="hash-segment-value" id="searchRawReadout" style="color: #f8fafc;">alice</span>
+                    </div>
+                    <div class="hash-segment">
+                        <span class="hash-segment-label">Escaped LIKE Literal</span>
+                        <span class="hash-segment-value" id="searchEscapedReadout" style="color: #fbbf24;">alice</span>
+                    </div>
+                    <div class="hash-segment">
+                        <span class="hash-segment-label">Bound @SearchPattern</span>
+                        <span class="hash-segment-value" id="searchBoundReadout" style="color: #34d399;">%alice%</span>
+                    </div>
+                </div>
+
+                <!-- Matched User Records Table -->
+                <h3 style="font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 10px;">
+                    Parameterized Query Result Set (<code>Users</code> Table Intact)
+                </h3>
+                <div class="table-responsive">
+                    <table class="db-table" aria-label="Parameterized Search Results">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Role</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchResultTableBody">
+                            <!-- Populated by runDirectorySearch() -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Full-Width Card: Activity 3 Vulnerability & Remediation Audit Ledger -->
+        <section class="card" aria-labelledby="ledgerTitle" style="margin-bottom: 32px;">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title" id="ledgerTitle">
+                        <span aria-hidden="true">📋</span> Activity 3 Security Vulnerability &amp; Remediation Audit Ledger
+                    </h2>
+                    <p style="font-size: 14.5px; color: var(--text-secondary); margin-top: 4px;">
+                        Explicit provenance separation between <strong>4 Measured Codebase Findings (<code>Identified in Codebase [M]</code>)</strong> discovered in the Activities 1–2 implementation and <strong>2 Simulated Exercise Baselines (<code>Simulated Exercise Baseline [SIM]</code>)</strong>.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span class="provenance-badge measured">4 Identified in Codebase [M]</span>
+                    <span class="provenance-badge simulated">2 Simulated Baselines [SIM]</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="db-table" aria-label="Vulnerability Remediation Ledger">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID &amp; Provenance</th>
+                            <th scope="col">Category &amp; Target Surface</th>
+                            <th scope="col">Vulnerability Identified</th>
+                            <th scope="col">Remediation Applied &amp; NUnit Verification</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vulnerabilityLedgerBody">
+                        <!-- Populated on load from SafeVault.getVulnerabilityLedger() -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 7 Telemetry &amp; Remediation Code Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Active</span>
+                    </div>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
+                </div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Target: <strong id="telemetryTarget">SecurityAuditService.ExecuteRemediationProbeAsync()</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">0.8ms</strong></span>
+                    </div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// Select any vulnerability preset or execute a parameterized directory search above
+// to inspect the C# before/after remediation diff and SQLite parameter bindings.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 7: Vulnerability Remediation Audit
+            </div>
+        </div>
+    </footer>
+
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
+    <script>
+        function selectProbePreset(vectorCategory, payload, btnId) {
+            document.querySelectorAll('.preset-pill').forEach(b => {
+                if (b.id && b.id.startsWith('preset')) b.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(btnId);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.getElementById('probeVectorSelect').value = vectorCategory;
+            document.getElementById('probePayloadInput').value = payload;
+            executeCurrentProbe();
+        }
+
+        async function executeCurrentProbe() {
+            const vector = document.getElementById('probeVectorSelect').value;
+            const payload = document.getElementById('probePayloadInput').value;
+            const res = await SafeVault.runRemediationProbe(vector, payload);
+
+            const provBadge = document.getElementById('probeProvenanceBadge');
+            provBadge.textContent = res.provenanceBadge;
+            provBadge.className = 'provenance-badge ' + (res.provenanceBadge.includes('[SIM]') && !res.provenanceBadge.includes('[M]') ? 'simulated' : 'measured');
+
+            document.getElementById('vulnerableCodeBox').textContent = res.vulnerablePattern;
+            document.getElementById('remediatedCodeBox').textContent = res.remediatedPattern;
+            document.getElementById('probeVerdictText').textContent = res.defenseVerdict;
+            document.getElementById('probeBoundOutput').textContent = 'Output / Binding: ' + res.sanitizedOrBoundOutput;
+
+            const statusBadge = document.getElementById('probeStatusBadge');
+            const verdictTag = document.getElementById('probeVerdictTag');
+            if (res.isAttackBlocked) {
+                statusBadge.textContent = 'BLOCKED & NEUTRALIZED';
+                statusBadge.className = 'http-badge http-200';
+                verdictTag.textContent = 'Attack Blocked';
+                verdictTag.style.color = '#34d399';
+            } else {
+                statusBadge.textContent = 'COMPLIANT INPUT ACCEPTED';
+                statusBadge.className = 'http-badge http-401';
+                verdictTag.textContent = 'Valid Input';
+                verdictTag.style.color = '#38bdf8';
+            }
+        }
+
+        async function runDirectorySearch(presetTerm) {
+            const inputEl = document.getElementById('directorySearchInput');
+            if (typeof presetTerm === 'string') {
+                inputEl.value = presetTerm;
+            }
+            const term = inputEl.value;
+            const res = await SafeVault.searchUsersParameterized(term);
+
+            document.getElementById('searchRawReadout').textContent = term || '(empty)';
+            document.getElementById('searchEscapedReadout').textContent = res.escapedLikePattern || '(rejected)';
+            document.getElementById('searchBoundReadout').textContent = res.boundParameter || 'NONE';
+
+            const countBadge = document.getElementById('searchMatchCountBadge');
+            countBadge.textContent = `${res.matches.length} row(s) matched`;
+            countBadge.style.color = res.matches.length === 0 ? '#fbbf24' : '#34d399';
+
+            const tbody = document.getElementById('searchResultTableBody');
+            if (res.matches.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 18px;">
+                            0 rows matched literal parameter <code>${SafeVault.escapeHtml(res.boundParameter || term)}</code> — SQLi &amp; wildcard dump neutralized.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = res.matches.map(u => `
+                <tr>
+                    <td><code>#${u.id}</code></td>
+                    <td><strong>${SafeVault.escapeHtml(u.username)}</strong></td>
+                    <td>${SafeVault.escapeHtml(u.email)}</td>
+                    <td>${SafeVault.renderRoleBadge(u.role)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderLedgerTable() {
+            const tbody = document.getElementById('vulnerabilityLedgerBody');
+            const items = SafeVault.getVulnerabilityLedger();
+            tbody.innerHTML = items.map(item => `
+                <tr>
+                    <td style="vertical-align: top; white-space: nowrap;">
+                        <div style="font-weight: 800; color: #ffffff; font-size: 16px; margin-bottom: 6px;">${SafeVault.escapeHtml(item.id)}</div>
+                        <span class="provenance-badge ${item.badgeType}">${SafeVault.escapeHtml(item.provenanceBadge)}</span>
+                    </td>
+                    <td style="vertical-align: top;">
+                        <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">${SafeVault.escapeHtml(item.category)}</div>
+                        <code style="font-size: 12.5px; color: var(--color-primary);">${SafeVault.escapeHtml(item.targetSurface)}</code>
+                    </td>
+                    <td style="vertical-align: top; font-size: 14px; color: var(--text-secondary);">
+                        ${SafeVault.escapeHtml(item.vulnerabilityDescription)}
+                    </td>
+                    <td style="vertical-align: top; font-size: 14px; color: var(--text-secondary);">
+                        <div style="margin-bottom: 6px;">${SafeVault.escapeHtml(item.remediationApplied)}</div>
+                        <div style="font-family: var(--font-mono); font-size: 12px; color: #34d399;">
+                            ✓ Verified by: ${SafeVault.escapeHtml(item.verificationTest)}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLedgerTable();
+            executeCurrentProbe();
+            runDirectorySearch('alice');
+        });
+    </script>
+</body>
+</html>
