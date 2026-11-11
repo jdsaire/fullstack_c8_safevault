@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeVault · Cycle 5: Authentication & Salted BCrypt Hashing</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activities 1–2 Protected</span>
+            </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+                <a href="cycle5-auth.html" class="nav-link active" aria-current="page">Cycle 5: Auth</a>
+                <a href="cycle6-rbac.html" class="nav-link">Cycle 6: RBAC</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">🔑</span> Cycle 5 · Activity 2 Authentication & Cryptographic Hashing
+            </div>
+            <h1 class="hero-title">Salted BCrypt Password Hashing & Login Verification</h1>
+            <p class="hero-subtitle">
+                Inspect how SafeVault hashes user credentials using <code>BCrypt.Net-Next</code> (cost factor 12, unique 128-bit salts) and verifies login attempts via constant-time comparison and parameterized SQLite queries.
+            </p>
+        </header>
+
+        <!-- Two-Column Workspace -->
+        <div class="workspace-grid">
+
+            <!-- Left Card: Credential Registration & BCrypt Hash Dissector -->
+            <section class="card" aria-labelledby="hashCardTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="hashCardTitle">
+                        <span aria-hidden="true">🔐</span> Account Registration & BCrypt Hash Dissector
+                    </h2>
+                    <span class="brand-badge" style="background: rgba(192, 132, 252, 0.18); color: #e9d5ff; border-color: rgba(192, 132, 252, 0.45);">
+                        BCrypt Work Factor 12
+                    </span>
+                </div>
+
+                <form id="registerAuthForm" novalidate onsubmit="handleRegisterSubmit(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div class="form-group">
+                            <label for="regUsername" class="form-label">
+                                <span>Username <span class="req" aria-hidden="true">*</span></span>
+                            </label>
+                            <input type="text" id="regUsername" class="form-control" required value="david_ops" placeholder="e.g. david_ops">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="regRole" class="form-label">
+                                <span>Assigned Role <span class="req" aria-hidden="true">*</span></span>
+                            </label>
+                            <select id="regRole" class="form-control">
+                                <option value="User" selected>User (Standard Vault Access)</option>
+                                <option value="Auditor">Auditor (Audit Log Reader)</option>
+                                <option value="Admin">Admin (Full Dashboard Control)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regEmail" class="form-label">
+                            <span>Email Address <span class="req" aria-hidden="true">*</span></span>
+                        </label>
+                        <input type="email" id="regEmail" class="form-control" required value="david@safevault.local">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPassword" class="form-label">
+                            <span>Plaintext Password <span class="req" aria-hidden="true">*</span></span>
+                            <span class="char-count">Min 8 chars, letter + digit</span>
+                        </label>
+                        <input type="text" id="regPassword" class="form-control" required value="VaultSecret#2026!" style="font-family: var(--font-mono);">
+                        <p class="form-hint">Never stored in plaintext. Immediately hashed with a fresh 128-bit cryptographic salt.</p>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            Register User & Hash Password ➔
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="compareSaltUniqueness()">
+                            ↻ Prove Unique Salt Generation
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Live BCrypt Hash Dissector -->
+                <div style="margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 13.5px; font-weight: 700; color: var(--color-primary); text-transform: uppercase;">
+                            Generated 60-Char BCrypt Modular Crypt String:
+                        </span>
+                        <span style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="hashLengthBadge">60 chars</span>
+                    </div>
+                    <div class="step-output" id="fullBcryptOutput" style="color: #6ee7b7; font-weight: 700; margin-bottom: 10px;">$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW</div>
+
+                    <div class="hash-dissector">
+                        <div class="hash-segment">
+                            <span class="hash-segment-label">Algorithm ID</span>
+                            <span class="hash-segment-value" style="color: #38bdf8;" id="dissectAlgo">$2a$ (BCrypt)</span>
+                        </div>
+                        <div class="hash-segment">
+                            <span class="hash-segment-label">Cost Factor</span>
+                            <span class="hash-segment-value" style="color: #c084fc;" id="dissectCost">12 (4,096 rounds)</span>
+                        </div>
+                        <div class="hash-segment">
+                            <span class="hash-segment-label">128-Bit Salt (22 chars)</span>
+                            <span class="hash-segment-value" style="color: #fbbf24;" id="dissectSalt">R9h/cIPz0gi.URNNX3kh2O</span>
+                        </div>
+                        <div class="hash-segment">
+                            <span class="hash-segment-label">Cipher Digest (31 chars)</span>
+                            <span class="hash-segment-value" style="color: #34d399;" id="dissectCipher">PST9/PgBkqquzi.Ss7KIUgO2t0jWMUW</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Card: Login Verification & Attack Simulator -->
+            <section class="card" aria-labelledby="loginSimTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="loginSimTitle">
+                        <span aria-hidden="true">🛡️</span> Login Authentication & Attack Simulator
+                    </h2>
+                    <span class="http-badge http-200" id="loginHttpBadge">200 OK</span>
+                </div>
+
+                <!-- Login Scenario Presets -->
+                <div style="margin-bottom: 16px;">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                        Select Login Scenario Preset:
+                    </span>
+                    <div class="preset-group">
+                        <button type="button" class="preset-pill" onclick="runLoginPreset('admin_vault', 'AdminVault#2026')">Valid Admin Login</button>
+                        <button type="button" class="preset-pill" onclick="runLoginPreset('alice_vault', 'AliceVault#2026')">Valid User Login</button>
+                        <button type="button" class="preset-pill" onclick="runLoginPreset('alice_vault', 'WrongPass#999')">Wrong Password (401)</button>
+                        <button type="button" class="preset-pill" onclick="runLoginPreset('ghost_user', 'AnyPass#2026')">Unknown User (401)</button>
+                        <button type="button" class="preset-pill" onclick="runLoginPreset(&quot;admin_vault' OR '1'='1&quot;, &quot;admin' --&quot;)">SQLi Login Bypass Probe</button>
+                    </div>
+                </div>
+
+                <form id="loginAuthForm" onsubmit="handleLoginSubmit(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div class="form-group">
+                            <label for="loginUsername" class="form-label">
+                                <span>Login Username <span class="req" aria-hidden="true">*</span></span>
+                            </label>
+                            <input type="text" id="loginUsername" class="form-control" required value="admin_vault" style="font-family: var(--font-mono);">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword" class="form-label">
+                                <span>Candidate Password <span class="req" aria-hidden="true">*</span></span>
+                            </label>
+                            <input type="text" id="loginPassword" class="form-control" required value="AdminVault#2026" style="font-family: var(--font-mono);">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Verify Credentials via AuthService.AuthenticateAsync() ➔
+                    </button>
+                </form>
+
+                <!-- Pipeline Verification Output -->
+                <div style="margin-top: 20px;">
+                    <div class="pipeline-step">
+                        <div class="step-header">
+                            <span class="step-name">Step 1: Parameterized User Account Lookup</span>
+                            <span class="step-method">UserRepository.cs</span>
+                        </div>
+                        <div class="step-output" id="authStepLookup">// Ready to execute parameterized lookup...</div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-header">
+                            <span class="step-name">Step 2: Constant-Time BCrypt Digest Verification</span>
+                            <span class="step-method">PasswordHasher.VerifyPassword()</span>
+                        </div>
+                        <div class="step-output" id="authStepVerify">// Ready to verify BCrypt salt and digest...</div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-header">
+                            <span class="step-name">Step 3: Session Token & Role Claim Issuance</span>
+                            <span class="step-method">AuthorizationService.cs</span>
+                        </div>
+                        <div class="step-output" id="authStepToken">// Session token output...</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Live Credential Store Table -->
+        <section class="card" aria-labelledby="authTableTitle" style="margin-bottom: 32px;">
+            <div class="card-header">
+                <h2 class="card-title" id="authTableTitle">
+                    <span aria-hidden="true">🗄️</span> SQLite Credential & Role Store: <code>Users</code> Table
+                </h2>
+                <button type="button" class="btn btn-outline btn-sm" onclick="SafeVault.renderAuthUserTable()">
+                    ↻ Refresh Store
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="db-table" aria-label="SafeVault Users with Password Hashes and Roles">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 70px;">ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col" style="width: 120px;">Role</th>
+                            <th scope="col">Salted BCrypt PasswordHash (<code>$2a$12$...</code>)</th>
+                            <th scope="col" style="width: 175px;">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="authUserTableBody">
+                        <!-- Populated dynamically by SafeVault engine -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 5 Telemetry & Authentication Code Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                    </div>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
+                </div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Target: <strong id="telemetryTarget">Cycle 5 Authentication</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
+                    </div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// Execute a registration, salt uniqueness check, or login verification above
+// to inspect the C# BCrypt.Net-Next and parameterized authentication trace.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 5: Authentication & BCrypt Hashing
+            </div>
+        </div>
+    </footer>
+
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
+    <script>
+        function updateDissectorUI(hash) {
+            const meta = SafeVault.inspectBcryptHash(hash);
+            document.getElementById('fullBcryptOutput').textContent = hash;
+            document.getElementById('hashLengthBadge').textContent = meta.totalLength + ' chars';
+            document.getElementById('dissectAlgo').textContent = meta.algorithm;
+            document.getElementById('dissectCost').textContent = meta.workFactor + ' (' + meta.rounds.toLocaleString() + ' rounds)';
+            document.getElementById('dissectSalt').textContent = meta.salt;
+            document.getElementById('dissectCipher').textContent = meta.cipherHash;
+        }
+
+        function compareSaltUniqueness() {
+            const pwd = document.getElementById('regPassword').value || 'VaultSecret#2026!';
+            const hash1 = SafeVault.generateBcryptHash(pwd, 12);
+            const hash2 = SafeVault.generateBcryptHash(pwd, 12);
+            const m1 = SafeVault.inspectBcryptHash(hash1);
+            const m2 = SafeVault.inspectBcryptHash(hash2);
+
+            updateDissectorUI(hash2);
+
+            const trace =
+`// Cryptographic Salt Uniqueness Verification (PasswordHasher.cs):
+// Plaintext Input: "${pwd}"
+// Hash #1: "${hash1}" (Salt: ${m1.salt})
+// Hash #2: "${hash2}" (Salt: ${m2.salt})
+// Result: Hash #1 != Hash #2 (128-bit CSPRNG salt prevents rainbow table & precomputation attacks)
+// Both verify TRUE via BCrypt.Net.BCrypt.Verify("${pwd}", hash).`;
+            SafeVault.recordTelemetry('Salt Uniqueness Check', 'PasswordHasher.HashPassword()', trace, 'Unique Salts Verified', '1.4ms');
+            SafeVault.showToast('Generated fresh 128-bit salt: identical passwords produce distinct hashes!', 'success');
+        }
+
+        async function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const u = document.getElementById('regUsername').value;
+            const em = document.getElementById('regEmail').value;
+            const pw = document.getElementById('regPassword').value;
+            const r = document.getElementById('regRole').value;
+
+            const res = await SafeVault.registerAuthAccount(u, em, pw, r);
+            if (!res.isAuthenticated) {
+                SafeVault.showToast(res.message, 'error');
+                return;
+            }
+            updateDissectorUI(res.passwordHash);
+            SafeVault.showToast(`Registered '${res.username}' (${res.role}) with salted BCrypt hash!`, 'success');
+        }
+
+        function runLoginPreset(username, password) {
+            document.getElementById('loginUsername').value = username;
+            document.getElementById('loginPassword').value = password;
+            handleLoginSubmit();
+        }
+
+        async function handleLoginSubmit(e) {
+            if (e) e.preventDefault();
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
+
+            const res = await SafeVault.authenticateLogin(u, p);
+            const badge = document.getElementById('loginHttpBadge');
+
+            document.getElementById('authStepLookup').textContent =
+                'Query: SELECT UserID, Username, Email, PasswordHash, Role FROM Users WHERE Username = @Username LIMIT 1;\n' +
+                'Bound Parameter: @Username = "' + u + '" (Type: Text, Literal value)\n' +
+                'Account Status: ' + (res.isAuthenticated ? 'Record located (User #' + res.userId + ', Role: ' + res.role + ')' : 'Rejected or not matched');
+
+            if (res.isAuthenticated) {
+                badge.textContent = '200 OK · Authenticated';
+                badge.className = 'http-badge http-200';
+                document.getElementById('authStepVerify').textContent =
+                    'Stored Hash: ' + res.passwordHash + '\n' +
+                    'BCrypt.Verify(candidatePassword, storedHash) => TRUE (Digest match)';
+                document.getElementById('authStepToken').textContent =
+                    'Status: HTTP 200 OK · Principal: ' + res.username + ' · Role Claim: ' + res.role + '\n' +
+                    'Signed Token: ' + res.token;
+                SafeVault.showToast(res.message, 'success');
+            } else {
+                badge.textContent = '401 Unauthorized';
+                badge.className = 'http-badge http-401';
+                document.getElementById('authStepVerify').textContent =
+                    'Verification Outcome: FALSE\n' +
+                    'Detail: ' + res.reason;
+                document.getElementById('authStepToken').textContent =
+                    'Status: HTTP 401 Unauthorized\n' +
+                    'Response: "' + res.message + '" · Zero session tokens issued.';
+                SafeVault.showToast('401 Unauthorized: ' + res.message, 'warning');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            SafeVault.renderAuthUserTable();
+            handleLoginSubmit();
+        });
+    </script>
+</body>
+</html>

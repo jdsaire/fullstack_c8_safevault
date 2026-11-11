@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeVault · Application Security Mission Hub</title>
+    <title>SafeVault · Application Security & RBAC Mission Hub</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
             <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
                 <span class="brand-icon" aria-hidden="true">🛡️</span>
                 <span class="brand-title">SafeVault</span>
-                <span class="brand-badge">Activity 1 Protected</span>
+                <span class="brand-badge">Activities 1–2 Protected</span>
             </a>
             <nav class="nav-links" aria-label="Primary Navigation">
                 <a href="index.html" class="nav-link active" aria-current="page">Overview</a>
@@ -23,6 +23,8 @@
                 <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
                 <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
                 <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+                <a href="cycle5-auth.html" class="nav-link">Cycle 5: Auth</a>
+                <a href="cycle6-rbac.html" class="nav-link">Cycle 6: RBAC</a>
             </nav>
             <div class="nav-actions">
                 <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
@@ -34,13 +36,13 @@
     <main class="main-content" id="mainContent" role="main">
 
         <!-- Scope & Boundary Callout -->
-        <div class="scope-callout warning" role="region" aria-label="Activity Scope Notice">
-            <span style="font-size: 20px;" aria-hidden="true">ℹ️</span>
+        <div class="scope-callout" role="region" aria-label="Activity Scope Notice">
+            <span style="font-size: 20px;" aria-hidden="true">🛡️</span>
             <div>
-                <strong>Activity 1 Scope Boundaries:</strong> SafeVault Activity 1 demonstrates <em>Input Validation, Sanitization, Parameterized SQLite Queries (SQLi prevention), and Automated Vulnerability Tests</em>.
+                <strong>Activities 1 &amp; 2 Active Security Scope:</strong> SafeVault now enforces <em>Input Validation, Dual-Stage XSS Sanitization, Parameterized SQLite Queries (Activity 1)</em> alongside <em>Salted BCrypt Password Hashing, Constant-Time Login Verification, HMAC-SHA256 Session Tokens, and Role-Based Access Control (RBAC) across Admin, Auditor, and User roles (Activity 2)</em>.
                 <br>
                 <span style="color: var(--text-muted); font-size: 13.5px;">
-                    Boundary Notice: User Authentication (password hashing via Argon2/bcrypt), credential management, login tokens, and Role-Based Access Control (RBAC) belong strictly to Activity 2.
+                    Isolation Boundary Notice: Activity 3 (Codebase Security Vulnerability Debugging Audit &amp; Criterion C6 Evaluation Summary) remains strictly isolated for the final capstone activity.
                 </span>
             </div>
         </div>
@@ -50,29 +52,29 @@
             <div class="hero-tag">
                 <span aria-hidden="true">🔒</span> Microsoft Full Stack Developer Specialization · Course 8 Capstone
             </div>
-            <h1 class="hero-title">Defensive Security Architecture & Guided Task Missions</h1>
+            <h1 class="hero-title">Defensive Security, Authentication &amp; RBAC Mission Hub</h1>
             <p class="hero-subtitle">
-                Welcome to SafeVault. Explore the defense-in-depth security mechanisms designed to eliminate SQL Injection (SQLi) and Cross-Site Scripting (XSS). Select any mission below to navigate to its dedicated full-page execution environment.
+                Explore SafeVault's cumulative defense-in-depth security layers across 6 dedicated full-page execution environments: input sanitization, SQL injection parameterization, XSS neutralization, salted BCrypt authentication, Role-Based Access Control (RBAC), and the 18-test NUnit verification suite.
             </p>
         </header>
 
-        <!-- 4 Guided Mission Cards (Multipage Navigation) -->
+        <!-- 6 Guided Mission Cards (Multipage Navigation) -->
         <section aria-labelledby="missionsHeading">
             <h2 id="missionsHeading" style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">
-                Guided Execution Cycles
+                Guided Execution Cycles (Activities 1 &amp; 2)
             </h2>
             <div class="mission-grid">
                 
                 <!-- Mission Card 1 -->
                 <article class="mission-card">
                     <div>
-                        <span class="mission-badge blue">Cycle 1 · Data Intake</span>
+                        <span class="mission-badge blue">Cycle 1 · Activity 1 Intake</span>
                         <h3 class="mission-heading">Valid User Registration</h3>
                         <p class="mission-desc">
                             Submit legitimate user credentials through the hardened client/server intake pipeline. Inspect real-time constraint validation, parameterized SQLite insertion, and relational storage.
                         </p>
                     </div>
-                    <a href="cycle1-intake.html" class="btn btn-primary btn-block">
+                    <a href="cycle1-intake.html" class="btn btn-outline btn-block">
                         Open Cycle 1: Intake ➔
                     </a>
                 </article>
@@ -80,10 +82,10 @@
                 <!-- Mission Card 2 -->
                 <article class="mission-card">
                     <div>
-                        <span class="mission-badge rose">Cycle 2 · SQLi Defense</span>
+                        <span class="mission-badge rose">Cycle 2 · Activity 1 SQLi</span>
                         <h3 class="mission-heading">SQL Injection Defense</h3>
                         <p class="mission-desc">
-                            Simulate tautologies (<code>' OR '1'='1</code>), stacked table drops, and inline comment attacks. Inspect how <code>SqliteParameter</code> binds inputs strictly as literal values, preserving database integrity.
+                            Simulate tautologies (<code>' OR '1'='1</code>), stacked table drops, and inline comment attacks. Inspect how <code>SqliteParameter</code> binds inputs strictly as literal values.
                         </p>
                     </div>
                     <a href="cycle2-sqli.html" class="btn btn-outline btn-block">
@@ -94,7 +96,7 @@
                 <!-- Mission Card 3 -->
                 <article class="mission-card">
                     <div>
-                        <span class="mission-badge amber">Cycle 3 · XSS Defense</span>
+                        <span class="mission-badge amber">Cycle 3 · Activity 1 XSS</span>
                         <h3 class="mission-heading">XSS Neutralization</h3>
                         <p class="mission-desc">
                             Inject malicious script execution tags, <code>onerror</code> event handlers, and pseudo-protocols. Observe how dual-stage client stripping and server entity encoding neutralize execution.
@@ -105,17 +107,45 @@
                     </a>
                 </article>
 
-                <!-- Mission Card 4 -->
+                <!-- Mission Card 5 (Activity 2 Auth) -->
+                <article class="mission-card" style="border-color: rgba(192, 132, 252, 0.45);">
+                    <div>
+                        <span class="mission-badge violet">Cycle 5 · Activity 2 Auth</span>
+                        <h3 class="mission-heading">BCrypt Password Hashing &amp; Login</h3>
+                        <p class="mission-desc">
+                            Dissect 60-character <code>$2a$12$</code> BCrypt hashes (cost factor 12, unique 128-bit salts). Simulate valid logins, wrong passwords (<code>401</code>), constant-time anti-enumeration, and SQLi login probes.
+                        </p>
+                    </div>
+                    <a href="cycle5-auth.html" class="btn btn-primary btn-block">
+                        Open Cycle 5: Auth ➔
+                    </a>
+                </article>
+
+                <!-- Mission Card 6 (Activity 2 RBAC) -->
+                <article class="mission-card" style="border-color: rgba(34, 211, 238, 0.45);">
+                    <div>
+                        <span class="mission-badge cyan">Cycle 6 · Activity 2 RBAC</span>
+                        <h3 class="mission-heading">RBAC &amp; Protected Admin Dashboard</h3>
+                        <p class="mission-desc">
+                            Switch roles (<code>Admin</code>, <code>Auditor</code>, <code>User</code>, <code>Guest</code>, or tampered token) to test route gates on <code>/api/admin/dashboard</code> and <code>/api/audit/logs</code> (<code>200 OK</code> vs <code>403</code>/<code>401</code>).
+                        </p>
+                    </div>
+                    <a href="cycle6-rbac.html" class="btn btn-primary btn-block">
+                        Open Cycle 6: RBAC ➔
+                    </a>
+                </article>
+
+                <!-- Mission Card 4 (Unified 18-Test Suite) -->
                 <article class="mission-card">
                     <div>
-                        <span class="mission-badge emerald">Cycle 4 · Verification</span>
-                        <h3 class="mission-heading">Automated Security Suite</h3>
+                        <span class="mission-badge emerald">Cycle 4 · Unified Verification</span>
+                        <h3 class="mission-heading">18-Test Automated NUnit Suite</h3>
                         <p class="mission-desc">
-                            Execute all 8 security unit test assertions live in-browser (mirroring <code>Tests/TestInputValidation.cs</code>) with detailed telemetry, pass/fail indicators, and execution timings.
+                            Execute all 18 security &amp; RBAC unit test assertions live in-browser (mirroring <code>TestInputValidation.cs</code> and <code>TestAuthAndRbac.cs</code>) with pass/fail telemetry.
                         </p>
                     </div>
                     <a href="cycle4-tests.html" class="btn btn-outline btn-block">
-                        Open Cycle 4: Tests ➔
+                        Open Cycle 4: 18 Tests ➔
                     </a>
                 </article>
 
@@ -127,11 +157,11 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title" id="archHeading">
-                        <span aria-hidden="true">⚙️</span> Activity 1 Defensive Architecture Summary
+                        <span aria-hidden="true">⚙️</span> Cumulative Defensive Architecture (Activities 1 &amp; 2)
                     </h2>
                     <span class="brand-badge">WCAG 2.1 AAA Compliant</span>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">1. Input Validation</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
@@ -141,19 +171,31 @@
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">2. Dual-Stage Sanitization</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Strips client-side dangerous tags and applies server-side <code>WebUtility.HtmlEncode</code> so special characters cannot execute as code in the DOM.
+                            Strips client-side dangerous tags and applies server-side <code>WebUtility.HtmlEncode</code> so special characters never execute as DOM code.
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">3. Parameterized Queries</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Zero string concatenation in SQL commands. Inputs are bound strictly as data values via <code>SqliteParameter</code>, preventing SQL injection.
+                            Zero string concatenation in SQL commands. Inputs are bound strictly as literal values via <code>SqliteParameter</code> across intake and login queries.
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">4. Automated Tests</h3>
+                        <h3 style="font-size: 16px; color: #c084fc; margin-bottom: 6px;">4. Salted BCrypt Hashing</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            8 NUnit security tests verify input boundaries, tautology injections, and script vectors under isolated in-memory test fixtures.
+                            Passwords are hashed via <code>BCrypt.Net-Next</code> (cost factor 12, unique 128-bit salts) and verified with constant-time anti-enumeration fallbacks.
+                        </p>
+                    </div>
+                    <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <h3 style="font-size: 16px; color: #22d3ee; margin-bottom: 6px;">5. RBAC &amp; Signed Tokens</h3>
+                        <p style="font-size: 14.5px; color: var(--text-secondary);">
+                            Enforces <code>Admin</code>, <code>Auditor</code>, and <code>User</code> role policies with HMAC-SHA256 session tokens protecting <code>/api/admin/dashboard</code> and <code>/api/audit/logs</code>.
+                        </p>
+                    </div>
+                    <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <h3 style="font-size: 16px; color: var(--color-success); margin-bottom: 6px;">6. 18 NUnit Security Tests</h3>
+                        <p style="font-size: 14.5px; color: var(--text-secondary);">
+                            8 input/SQLi/XSS tests (<code>TestInputValidation</code>) + 10 BCrypt/login/RBAC tests (<code>TestAuthAndRbac</code>) verified against in-memory SQLite.
                         </p>
                     </div>
                 </div>
@@ -166,7 +208,7 @@
                 <div class="telemetry-header">
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Session Telemetry & Code Generation Inspector</h3>
+                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
                         <span class="telemetry-status" id="telemetryStatus">Active</span>
                     </div>
                     <div class="telemetry-actions">
@@ -177,14 +219,14 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Status: <strong id="telemetryTarget">Mission Hub Ready</strong></span>
+                        <span>Status: <strong id="telemetryTarget">Mission Hub Ready (Activities 1–2)</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
                         <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// SafeVault Activity 1 Multi-Page Architecture Active.
-// Navigate to any dedicated cycle page to generate and inspect parameterized SQL queries,
-// sanitized entity transformations, or live NUnit security assertion traces.</code></pre>
+                        <pre><code id="telemetryCode">// SafeVault Activities 1 &amp; 2 Multipage Architecture Active.
+// Navigate to Cycle 5 (Authentication &amp; BCrypt) or Cycle 6 (RBAC &amp; Admin Dashboard)
+// to inspect salted password hashes, HMAC session tokens, and route policy gates.</code></pre>
                     </div>
                 </div>
             </div>
