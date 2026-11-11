@@ -30,9 +30,29 @@ public class AuthorizationService
 
     public string IssueSessionToken(int userId, string username, string role)
     {
+        if (userId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(userId), "User ID must be a positive integer.");
+        }
+
+        if (string.IsNullOrWhiteSpace(username) ||
+            username.Length > 50 ||
+            username.Contains('|') ||
+            username.Any(char.IsControl))
+        {
+            throw new ArgumentException(
+                "Username cannot be empty, exceed 50 characters, or contain pipe delimiters or control characters.",
+                nameof(username));
+        }
+
+        if (!VaultRoles.IsValidRole(role))
+        {
+            throw new ArgumentException("Invalid role specified for session token issuance.", nameof(role));
+        }
+
         var normalizedRole = VaultRoles.NormalizeRole(role);
         var expiresAtUnix = DateTimeOffset.UtcNow.Add(_tokenLifetime).ToUnixTimeSeconds();
-        var payload = $"{userId}|{username}|{normalizedRole}|{expiresAtUnix}";
+        var payload = $"{userId}|{username.Trim()}|{normalizedRole}|{expiresAtUnix}";
         var payloadBase64 = Base64UrlEncode(Encoding.UTF8.GetBytes(payload));
         var signatureBase64 = ComputeSignature(payloadBase64);
 
@@ -79,12 +99,19 @@ public class AuthorizationService
                 return (false, 0, null, null);
             }
 
-            if (!int.TryParse(fields[0], out var userId))
+            if (!int.TryParse(fields[0], out var userId) || userId <= 0)
             {
                 return (false, 0, null, null);
             }
 
             var username = fields[1];
+            if (string.IsNullOrWhiteSpace(username) ||
+                username.Length > 50 ||
+                username.Any(char.IsControl))
+            {
+                return (false, 0, null, null);
+            }
+
             var role = fields[2];
 
             if (!long.TryParse(fields[3], out var expiresAtUnix))
