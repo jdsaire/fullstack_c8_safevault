@@ -3,1384 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeVault — Secure Input Validation & Parameterized Queries</title>
-    <meta name="description" content="SafeVault: Course 8 Security and Authentication Capstone. Interactive demonstration of input validation, sanitization, parameterized queries, and vulnerability testing.">
-    <style>
-        :root {
-            --bg-base: #070b14;
-            --bg-surface: #0f172a;
-            --bg-card: #1e293b;
-            --bg-card-hover: #26354a;
-            --bg-code: #030712;
-            --border-subtle: #334155;
-            --border-focus: #38bdf8;
-            --text-primary: #ffffff;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --accent-cyan: #38bdf8;
-            --accent-cyan-dark: #0284c7;
-            --accent-emerald: #34d399;
-            --accent-emerald-bg: rgba(52, 211, 153, 0.14);
-            --accent-rose: #fb7185;
-            --accent-rose-bg: rgba(251, 113, 133, 0.14);
-            --accent-amber: #fbbf24;
-            --accent-amber-bg: rgba(251, 191, 36, 0.14);
-            --radius-md: 10px;
-            --radius-lg: 16px;
-            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-base);
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-size: 16px; /* Base 16px for WCAG compliance */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        header {
-            background-color: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-subtle);
-            padding: 18px 28px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .brand-shield {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent-cyan-dark), var(--accent-cyan));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
-        }
-
-        .brand-shield svg {
-            width: 22px;
-            height: 22px;
-            fill: white;
-        }
-
-        .brand-title {
-            font-size: 1.35rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--text-primary);
-        }
-
-        .brand-badge {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 9999px;
-            background-color: var(--accent-emerald-bg);
-            color: var(--accent-emerald);
-            border: 1px solid rgba(52, 211, 153, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .brand-badge::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-emerald);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
-
-        .header-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-link {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: var(--radius-md);
-        }
-
-        .header-link:hover {
-            color: var(--accent-cyan);
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        main {
-            flex: 1;
-            max-width: 1240px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 36px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
-
-        .hero {
-            text-align: center;
-            max-width: 820px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
-            line-height: 1.25;
-        }
-
-        .hero p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        /* Guided Task Missions Section (NEW - Resolving Issue 2) */
-        .guided-section {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 28px 32px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .guided-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 16px;
-        }
-
-        .guided-title-box h2 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .guided-title-box p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-top: 4px;
-        }
-
-        .missions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 18px;
-        }
-
-        .mission-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 14px;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .mission-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .mission-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 3px 8px;
-            border-radius: 6px;
-            width: fit-content;
-        }
-
-        .mission-badge.blue { background-color: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); }
-        .mission-badge.rose { background-color: var(--accent-rose-bg); color: var(--accent-rose); }
-        .mission-badge.emerald { background-color: var(--accent-emerald-bg); color: var(--accent-emerald); }
-        .mission-badge.amber { background-color: var(--accent-amber-bg); color: var(--accent-amber); }
-
-        .mission-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-top: 4px;
-        }
-
-        .mission-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .mission-btn {
-            background-color: rgba(255, 255, 255, 0.07);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            padding: 10px 14px;
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 44px; /* WCAG 44px target */
-            width: 100%;
-        }
-
-        .mission-btn:hover {
-            background-color: var(--accent-cyan-dark);
-            border-color: var(--accent-cyan);
-            color: white;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
-        }
-
-        /* Nav Tabs */
-        .tab-bar {
-            display: flex;
-            justify-content: center;
-            background-color: var(--bg-surface);
-            padding: 6px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-subtle);
-            max-width: 720px;
-            margin: 0 auto;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 18px;
-            border-radius: var(--radius-md);
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            min-height: 46px; /* WCAG touch target */
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary);
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .tab-btn.active {
-            background-color: var(--accent-cyan-dark);
-            color: white;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Grid Layout */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 28px;
-        }
-
-        @media (max-width: 960px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 18px;
-            gap: 12px;
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-subtitle {
-            font-size: 0.925rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            line-height: 1.5;
-        }
-
-        /* Form elements */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-label {
-            font-size: 0.975rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .form-label span.req {
-            color: var(--accent-rose);
-        }
-
-        .form-input {
-            background-color: var(--bg-surface);
-            border: 1.5px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 13px 16px;
-            color: var(--text-primary);
-            font-size: 1rem; /* 16px prevents mobile auto-zoom */
-            outline: none;
-            transition: all 0.2s;
-            font-family: inherit;
-            min-height: 48px; /* WCAG 48px input */
-        }
-
-        .form-input:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-        }
-
-        .form-hint {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .quick-presets {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.25);
-            padding: 14px;
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .preset-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-right: 4px;
-            width: 100%;
-        }
-
-        .preset-chip {
-            background-color: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-subtle);
-            border-radius: 9999px;
-            padding: 8px 14px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: var(--font-mono);
-            min-height: 44px; /* WCAG target */
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .preset-chip:hover {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            background-color: rgba(56, 189, 248, 0.12);
-        }
-
-        .preset-chip.danger:hover {
-            border-color: var(--accent-rose);
-            color: var(--accent-rose);
-            background-color: var(--accent-rose-bg);
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, var(--accent-cyan-dark), #0369a1);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 14px 24px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-            min-height: 50px;
-        }
-
-        .submit-btn:hover {
-            background: linear-gradient(135deg, #0284c7, var(--accent-cyan));
-            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
-        }
-
-        /* Pipeline Inspector */
-        .pipeline-card {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .step-badge {
-            font-size: 0.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            padding: 3px 10px;
-            border-radius: 6px;
-            width: fit-content;
-        }
-
-        .step-badge.blue {
-            background-color: rgba(56, 189, 248, 0.18);
-            color: var(--accent-cyan);
-        }
-
-        .step-badge.emerald {
-            background-color: var(--accent-emerald-bg);
-            color: var(--accent-emerald);
-        }
-
-        .step-badge.amber {
-            background-color: var(--accent-amber-bg);
-            color: var(--accent-amber);
-        }
-
-        .code-box {
-            background-color: var(--bg-code);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 14px 16px;
-            font-family: var(--font-mono);
-            font-size: 0.9rem; /* 14.5px readable monospace */
-            line-height: 1.65;
-            color: #f1f5f9;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .code-box .sql { color: #38bdf8; font-weight: 700; }
-        .code-box .param { color: #34d399; font-weight: 700; }
-        .code-box .val { color: #fde047; }
-        .code-box .err { color: #fb7185; }
-
-        /* Notification Banner */
-        .notification {
-            padding: 16px 20px;
-            border-radius: var(--radius-md);
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: none;
-            border: 1.5px solid transparent;
-            line-height: 1.5;
-        }
-
-        .notification.success {
-            display: flex;
-            background-color: var(--accent-emerald-bg);
-            border-color: rgba(52, 211, 153, 0.5);
-            color: #a7f3d0;
-        }
-
-        .notification.error {
-            display: flex;
-            background-color: var(--accent-rose-bg);
-            border-color: rgba(251, 113, 133, 0.5);
-            color: #fecdd3;
-        }
-
-        /* Database Table */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            text-align: left;
-        }
-
-        th {
-            background-color: var(--bg-surface);
-            color: var(--text-primary);
-            font-weight: 700;
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        td {
-            padding: 14px 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-secondary);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        .badge {
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .badge.pass {
-            background-color: var(--accent-emerald-bg);
-            color: var(--accent-emerald);
-            border: 1px solid rgba(52, 211, 153, 0.35);
-        }
-
-        .badge.blocked {
-            background-color: var(--accent-rose-bg);
-            color: var(--accent-rose);
-            border: 1px solid rgba(251, 113, 133, 0.35);
-        }
-
-        /* Test suite list */
-        .test-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .test-item {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .test-name {
-            font-family: var(--font-mono);
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .test-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            line-height: 1.45;
-        }
-
-        footer {
-            margin-top: auto;
-            border-top: 1px solid var(--border-subtle);
-            padding: 24px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        footer a {
-            color: var(--text-secondary);
-            text-decoration: underline;
-        }
-
-        footer a:hover {
-            color: var(--accent-cyan);
-        }
-    </style>
+    <title>SafeVault · Cycle 1: Valid User Registration</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <header>
-        <a href="#" class="brand">
-            <div class="brand-shield">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.54-3.15 8.79-7 9.88-3.85-1.09-7-5.34-7-9.88V6.3l7-3.12z"/>
-                    <path d="M10 15.5l-3.5-3.5 1.41-1.41L10 12.67l6.09-6.09 1.41 1.41z"/>
-                </svg>
-            </div>
-            <div>
-                <div class="brand-title">SafeVault</div>
-                <div style="font-size: 0.775rem; color: var(--text-muted); font-weight: 500;">Application Security Platform</div>
-            </div>
-        </a>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
 
-        <div class="header-links">
-            <span class="brand-badge">Activity 1 Protected</span>
-            <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener" class="header-link">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                </svg>
-                GitHub Repository
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activity 1 Protected</span>
             </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link active" aria-current="page">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
         </div>
     </header>
 
-    <main>
-        <div class="hero">
-            <h1>Secure Input Validation & SQLi Prevention</h1>
-            <p>Course 8 Capstone (SafeVault) · Defense-in-depth security demonstration showing how strict input validation, client/server sanitization, and parameterized SQLite queries prevent SQL Injection and Cross-Site Scripting (XSS).</p>
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">📝</span> Cycle 1 · Data Intake & Validation
+            </div>
+            <h1 class="hero-title">Legitimate User Intake & Parameterized Insertion</h1>
+            <p class="hero-subtitle">
+                Enter valid user credentials to observe the dual-stage defense in action: regex constraint enforcement, client/server HTML entity encoding, and safe parameterized insertion into SQLite.
+            </p>
+        </header>
+
+        <!-- Two-Column Workspace -->
+        <div class="workspace-grid">
+
+            <!-- Left Card: Interactive Form -->
+            <section class="card" aria-labelledby="formTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="formTitle">
+                        <span aria-hidden="true">✏️</span> SafeVault User Registration
+                    </h2>
+                    <span class="brand-badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.35);">
+                        Defense Guard Active
+                    </span>
+                </div>
+
+                <!-- Preset Selectors -->
+                <div style="margin-bottom: 16px;">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                        Quick Input Presets:
+                    </span>
+                    <div class="preset-group">
+                        <button type="button" class="preset-pill" onclick="loadPreset('alice_test', 'alice.test@vault.corp')">alice_test</button>
+                        <button type="button" class="preset-pill" onclick="loadPreset('dev_sec_ops', 'devsec@defense.net')">dev_sec_ops</button>
+                        <button type="button" class="preset-pill" onclick="loadPreset('auditor.one', 'auditor1@compliance.org')">auditor.one</button>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <form id="vaultForm" novalidate onsubmit="handleFormSubmit(event)">
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <span>Username <span class="req" aria-hidden="true">*</span></span>
+                            <span class="char-count" id="userCharCount">0/50</span>
+                        </label>
+                        <input type="text" id="username" name="username" class="form-control" required minlength="3" maxlength="50" placeholder="e.g. alice_vault" autocomplete="username">
+                        <p class="form-hint">Constraints: 3–50 chars, alphanumeric, underscores, hyphens, and periods.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <span>Email Address <span class="req" aria-hidden="true">*</span></span>
+                        </label>
+                        <input type="email" id="email" name="email" class="form-control" required placeholder="e.g. alice@safevault.local" autocomplete="email">
+                        <p class="form-hint">Constraints: Valid RFC 5322 format.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                        Submit Registration & Inspect Defense ➔
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Card: Live Defensive Pipeline Inspector -->
+            <section class="card" aria-labelledby="pipelineTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="pipelineTitle">
+                        <span aria-hidden="true">🔍</span> Defensive Pipeline Inspector
+                    </h2>
+                    <span class="telemetry-status" id="pipelineStatus">Idle</span>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Step 1: Input Validation & Sanitization</span>
+                        <span class="step-method">InputValidator.cs</span>
+                    </div>
+                    <div class="step-output" id="inspectSanitized">// Awaiting form submission...</div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Step 2: Parameterized SQL Command</span>
+                        <span class="step-method">SqliteParameter</span>
+                    </div>
+                    <div class="step-output" id="inspectParams">// Awaiting form submission...</div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Step 3: Relational Execution Status</span>
+                        <span class="step-method">ExecuteNonQuery()</span>
+                    </div>
+                    <div class="step-output" id="inspectResult">// Ready to record SQLite response.</div>
+                </div>
+            </section>
+
         </div>
 
-        <!-- VISITOR ONBOARDING & GUIDED TASK MISSIONS (NEW) -->
-        <section class="guided-section" aria-labelledby="guided-tasks-title">
-            <div class="guided-header">
-                <div class="guided-title-box">
-                    <h2 id="guided-tasks-title">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent-cyan)">
-                            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
-                        </svg>
-                        What can you run in SafeVault? (Guided Task Cycles)
-                    </h2>
-                    <p>New to this live artifact? Follow the 4 guided execution cycles below to test and inspect the security mechanisms in action:</p>
-                </div>
-                <span class="badge pass">Interactive Verification Active</span>
+        <!-- Relational Database Table View -->
+        <section class="card" aria-labelledby="tableTitle" style="margin-bottom: 32px;">
+            <div class="card-header">
+                <h2 class="card-title" id="tableTitle">
+                    <span aria-hidden="true">🗄️</span> Live SQLite Relational Table: <code>Users</code>
+                </h2>
+                <button type="button" class="btn btn-outline btn-sm" onclick="SafeVault.renderUserTable()">
+                    ↻ Refresh Table
+                </button>
             </div>
+            <div class="table-responsive">
+                <table class="db-table" aria-label="SafeVault Registered Users">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 80px;">ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col" style="width: 200px;">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- Populated dynamically by SafeVault engine -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-            <div class="missions-grid">
-                <!-- Mission 1 -->
-                <div class="mission-card">
-                    <div>
-                        <span class="mission-badge blue">Cycle 1 · Intake</span>
-                        <div class="mission-title">Valid User Registration</div>
-                        <div class="mission-desc">Submits legitimate user data. Demonstrates regular expression compliance, parameter binding, and live relational table insertion.</div>
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 1 Telemetry & Generated Code Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
                     </div>
-                    <button type="button" class="mission-btn" onclick="runMission1()">
-                        ▶ Run Mission 1: Valid Intake
-                    </button>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
                 </div>
-
-                <!-- Mission 2 -->
-                <div class="mission-card">
-                    <div>
-                        <span class="mission-badge rose">Cycle 2 · SQLi Defense</span>
-                        <div class="mission-title">Test SQL Injection Defense</div>
-                        <div class="mission-desc">Loads tautology (<code>' OR '1'='1</code>) and stacked drops. Demonstrates how <code>SqliteParameter</code> binds inputs as literal text, leaving tables intact.</div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Target: <strong id="telemetryTarget">Cycle 1 Intake</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
-                    <button type="button" class="mission-btn" onclick="runMission2()">
-                        ▶ Run Mission 2: SQLi Attack
-                    </button>
-                </div>
-
-                <!-- Mission 3 -->
-                <div class="mission-card">
-                    <div>
-                        <span class="mission-badge amber">Cycle 3 · XSS Defense</span>
-                        <div class="mission-title">Test XSS Neutralization</div>
-                        <div class="mission-desc">Loads malicious script tags (<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>). Demonstrates tag stripping and HTML entity encoding.</div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// Execute a registration submission above to inspect the exact C# SqliteCommand,
+// parameter bindings, and execution latency in this quarantined panel.</code></pre>
                     </div>
-                    <button type="button" class="mission-btn" onclick="runMission3()">
-                        ▶ Run Mission 3: XSS Attack
-                    </button>
-                </div>
-
-                <!-- Mission 4 -->
-                <div class="mission-card">
-                    <div>
-                        <span class="mission-badge emerald">Cycle 4 · Test Suite</span>
-                        <div class="mission-title">Run Automated NUnit Suite</div>
-                        <div class="mission-desc">Executes all 8 security assertions live in-browser (mirroring <code>Tests/TestInputValidation.cs</code>) with instant pass telemetry.</div>
-                    </div>
-                    <button type="button" class="mission-btn" onclick="runMission4()">
-                        ▶ Run Mission 4: All 8 Tests
-                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- Navigation Tabs -->
-        <nav class="tab-bar" aria-label="Platform Views">
-            <button class="tab-btn active" id="tabBtnRegister" onclick="switchTab('tab-register', this)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7.5" r="4"/><path d="M20 8v6M23 11h-6"/>
-                </svg>
-                Registration & Defense Pipeline
-            </button>
-            <button class="tab-btn" id="tabBtnDatabase" onclick="switchTab('tab-database', this)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                </svg>
-                Database & Parameterized Inspector
-            </button>
-            <button class="tab-btn" id="tabBtnTests" onclick="switchTab('tab-tests', this)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                Vulnerability Attack Playground
-            </button>
-        </nav>
-
-        <!-- Notification Banner -->
-        <div id="globalNotification" class="notification" role="alert"></div>
-
-        <!-- TAB 1: Registration Form & Pipeline -->
-        <div id="tab-register" class="tab-content active">
-            <div class="dashboard-grid">
-                <!-- Registration Form Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent-cyan)">
-                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                </svg>
-                                SafeVault User Form
-                            </div>
-                            <div class="card-subtitle">Source: <code>webform.html</code> hardened with client-side sanitization and constraint validation.</div>
-                        </div>
-                        <span class="badge pass">Form Guard Active</span>
-                    </div>
-
-                    <form id="vaultForm" action="/submit" method="post" novalidate>
-                        <div class="form-group">
-                            <label class="form-label" for="username">
-                                Username <span class="req">*</span>
-                                <span id="userCharCount" class="form-hint">0/50</span>
-                            </label>
-                            <input type="text"
-                                   id="username"
-                                   name="username"
-                                   class="form-input"
-                                   placeholder="e.g. alice_vault"
-                                   required
-                                   minlength="3"
-                                   maxlength="50"
-                                   autocomplete="username">
-                            <span class="form-hint">Constraint: 3–50 chars (alphanumeric, underscores, hyphens, periods).</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="email">
-                                Email Address <span class="req">*</span>
-                            </label>
-                            <input type="email"
-                                   id="email"
-                                   name="email"
-                                   class="form-input"
-                                   placeholder="e.g. alice@safevault.local"
-                                   required
-                                   maxlength="100"
-                                   autocomplete="email">
-                            <span class="form-hint">Constraint: Must match standard RFC 5322 email syntax (max 100 chars).</span>
-                        </div>
-
-                        <div class="quick-presets">
-                            <span class="preset-label">Test Attack Presets:</span>
-                            <button type="button" class="preset-chip" onclick="loadPreset('alice_vault', 'alice@safevault.local')">Clean User</button>
-                            <button type="button" class="preset-chip danger" onclick="loadPreset('\' OR \'1\'=\'1', 'sqli@test.local')">SQLi: ' OR '1'='1</button>
-                            <button type="button" class="preset-chip danger" onclick="loadPreset('&lt;script&gt;alert(\'XSS\')&lt;/script&gt;', 'xss@test.local')">XSS: &lt;script&gt;</button>
-                            <button type="button" class="preset-chip danger" onclick="loadPreset('\'; DROP TABLE Users; --', 'drop@test.local')">SQLi: Drop Table</button>
-                        </div>
-
-                        <button type="submit" class="submit-btn" id="btnSubmit">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            </svg>
-                            Execute Secure Submission Cycle
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Pipeline Inspector Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent-emerald)">
-                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                                </svg>
-                                Defensive Pipeline Inspector
-                            </div>
-                            <div class="card-subtitle">Real-time breakdown of validation, HTML entity escaping, and parameterized query binding.</div>
-                        </div>
-                        <span id="pipelineStatus" class="badge pass">Idle · Ready</span>
-                    </div>
-
-                    <!-- Step 1: Input Sanitization -->
-                    <div class="pipeline-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span class="step-badge blue">Step 1 · Input Sanitization & Encoding</span>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">WebUtility.HtmlEncode</span>
-                        </div>
-                        <div class="code-box" id="inspectSanitized">// Submit the form or run a mission above to inspect the pipeline</div>
-                    </div>
-
-                    <!-- Step 2: Parameterized SQL Query -->
-                    <div class="pipeline-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span class="step-badge emerald">Step 2 · Parameterized Query (SqliteParameter)</span>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Zero Concatenation</span>
-                        </div>
-                        <div class="code-box" id="inspectSql"><span class="sql">INSERT INTO</span> Users (Username, Email) <br><span class="sql">VALUES</span> (<span class="param">@Username</span>, <span class="param">@Email</span>);<br><span class="sql">SELECT</span> last_insert_rowid();</div>
-                        <div class="code-box" id="inspectParams" style="color: var(--accent-emerald);">// Bound parameters will display here</div>
-                    </div>
-
-                    <!-- Step 3: Result Breakdown -->
-                    <div class="pipeline-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span class="step-badge amber">Step 3 · Defense Audit & Telemetry</span>
-                            <span id="inspectElapsed" style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">0 ms</span>
-                        </div>
-                        <div class="code-box" id="inspectResult">// Ready for execution cycle</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: Database Table & Lookup -->
-        <div id="tab-database" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent-cyan)">
-                                <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                            </svg>
-                            SafeVault Relational Store (Users Table)
-                        </div>
-                        <div class="card-subtitle">Source: <code>database.sql</code> schema · Live view of verified registered vault entities.</div>
-                    </div>
-                    <button type="button" class="preset-chip" onclick="resetDatabaseState()">Reset Seed State</button>
-                </div>
-
-                <!-- Parameterized Search Bar -->
-                <div style="display: flex; gap: 14px; align-items: flex-end; background-color: var(--bg-surface); padding: 18px; border-radius: var(--radius-md); border: 1.5px solid var(--border-subtle); flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 8px;">
-                        <label for="queryUsername" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono);">
-                            <span class="sql">SELECT</span> UserID, Username, Email <span class="sql">FROM</span> Users <span class="sql">WHERE</span> Username = <span class="param">@Username</span>;
-                        </label>
-                        <input type="text" id="queryUsername" class="form-input" placeholder="Search by @Username (e.g. alice_vault or ' OR '1'='1)">
-                    </div>
-                    <button type="button" class="submit-btn" onclick="executeLookup()" style="padding: 12px 22px; height: 48px;">
-                        Search Parameterized
-                    </button>
-                </div>
-
-                <div id="lookupFeedback" style="font-size: 0.95rem; font-family: var(--font-mono); color: var(--accent-cyan); display: none; padding: 12px; background-color: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.25);"></div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>UserID</th>
-                                <th>Username (Sanitized)</th>
-                                <th>Email Address</th>
-                                <th>Verification Status</th>
-                                <th>Security Defense Layer</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody">
-                            <!-- Injected by script -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: Vulnerability Playground & Security Tests -->
-        <div id="tab-tests" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent-rose)">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            </svg>
-                            Automated Vulnerability Test Suite
-                        </div>
-                        <div class="card-subtitle">Exact mirror of <code>Tests/TestInputValidation.cs</code> (NUnit Test Fixture) executed live in-browser.</div>
-                    </div>
-                    <button type="button" class="submit-btn" onclick="runAutomatedSecuritySuite()" id="btnRunSuite">
-                        Run All 8 Security Tests
-                    </button>
-                </div>
-
-                <div id="suiteSummary" style="display: none; padding: 16px; border-radius: var(--radius-md); font-weight: 700; font-size: 1rem;"></div>
-
-                <div class="test-list" id="testListContainer">
-                    <div class="test-item" id="test-sqli">
-                        <div>
-                            <div class="test-name">TestForSQLInjection()</div>
-                            <div class="test-desc">Injects tautologies, stacked drops ('; DROP TABLE Users; --'), and comment terminations. Verifies SqliteParameter treats payloads strictly as data.</div>
-                        </div>
-                        <span class="badge" id="badge-sqli" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-xss">
-                        <div>
-                            <div class="test-name">TestForXSS()</div>
-                            <div class="test-desc">Injects &lt;script&gt;, &lt;img onerror&gt;, &lt;svg onload&gt;, and javascript: pseudoprotocols. Verifies complete neutralization.</div>
-                        </div>
-                        <span class="badge" id="badge-xss" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-val-user">
-                        <div>
-                            <div class="test-name">TestValidInput_PassesValidation()</div>
-                            <div class="test-desc">Verifies compliant alphanumeric usernames and valid RFC 5322 emails are approved.</div>
-                        </div>
-                        <span class="badge" id="badge-val-user" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-bound-user">
-                        <div>
-                            <div class="test-name">TestInvalidInput_FailsValidation(Username Boundary &lt; 3 or &gt; 50)</div>
-                            <div class="test-desc">Enforces strict 3 to 50 character length constraint.</div>
-                        </div>
-                        <span class="badge" id="badge-bound-user" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-chars-user">
-                        <div>
-                            <div class="test-name">TestInvalidInput_FailsValidation(Illegal Characters in Username)</div>
-                            <div class="test-desc">Blocks unallowed control characters, spaces, and dangerous punctuation.</div>
-                        </div>
-                        <span class="badge" id="badge-chars-user" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-empty-email">
-                        <div>
-                            <div class="test-name">TestInvalidInput_FailsValidation(Empty Email)</div>
-                            <div class="test-desc">Enforces required email presence.</div>
-                        </div>
-                        <span class="badge" id="badge-empty-email" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-fmt-email">
-                        <div>
-                            <div class="test-name">TestInvalidInput_FailsValidation(Invalid Email Format)</div>
-                            <div class="test-desc">Rejects malformed addresses lacking domain or @ symbol.</div>
-                        </div>
-                        <span class="badge" id="badge-fmt-email" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-
-                    <div class="test-item" id="test-table-intact">
-                        <div>
-                            <div class="test-name">TestTableIntegrity_PostAttackVerification()</div>
-                            <div class="test-desc">Asserts Users relational schema persists intact after batch malicious injection attempts.</div>
-                        </div>
-                        <span class="badge" id="badge-table-intact" style="background-color: rgba(255, 255, 255, 0.08); color: var(--text-muted);">Ready</span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 
-    <footer>
-        <p>SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener">Juan Diego S. (jdsaire)</a></p>
-        <p style="margin-top: 6px; font-size: 0.825rem;">Built with zero AI attribution · WCAG 2.1 AAA/AA Accessible · Verified under AG-KIT v1_1</p>
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 1: Legitimate Intake
+            </div>
+        </div>
     </footer>
 
-    <!-- SafeVault Engine Logic (Client-Side + Dual Backend Mode) -->
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
     <script>
-        // In-memory Database state replicating SQLite Users table
-        const initialUsers = [
-            { userId: 1, username: "alice_vault", email: "alice@safevault.local", defense: "Standard (Clean Input)", isClean: true },
-            { userId: 2, username: "bob_secure", email: "bob@safevault.local", defense: "Standard (Clean Input)", isClean: true },
-            { userId: 3, username: "' OR '1'='1", email: "sqli_literal@isolated.local", defense: "SqliteParameter Bound (Literal String)", isClean: false },
-            { userId: 4, username: "&lt;b&gt;encoded&lt;/b&gt;", email: "xss_safe@isolated.local", defense: "HtmlEncode Sanitized", isClean: false }
-        ];
-
-        let databaseStore = JSON.parse(localStorage.getItem('safevault_db') || 'null') || [...initialUsers];
-
-        function saveDatabase() {
-            localStorage.setItem('safevault_db', JSON.stringify(databaseStore));
-            renderUserTable();
-        }
-
-        function resetDatabaseState() {
-            databaseStore = [...initialUsers];
-            saveDatabase();
-            showNotification('Database reset to initial seed state.', 'success');
-        }
-
-        // Sanitization and Validation Core (Matches InputValidator.cs)
-        function sanitizeString(input) {
-            if (!input) return '';
-            let stripped = input.replace(/<[^>]*>/g, '')
-                               .replace(/javascript:/gi, '')
-                               .replace(/onerror=/gi, '')
-                               .replace(/onload=/gi, '')
-                               .replace(/onclick=/gi, '')
-                               .trim();
-            return stripped
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function validateInputs(username, email) {
-            const errors = [];
-            const usernamePattern = /^[a-zA-Z0-9_\-\.]{3,50}$/;
-            const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-
-            if (!username || username.trim().length === 0) {
-                errors.push("Username is required.");
-            } else if (username.length < 3 || username.length > 50) {
-                errors.push("Username must be between 3 and 50 characters.");
-            } else if (!usernamePattern.test(username)) {
-                errors.push("Username contains invalid characters. Only alphanumeric, underscores, hyphens, and periods allowed.");
-            }
-
-            if (!email || email.trim().length === 0) {
-                errors.push("Email is required.");
-            } else if (email.length > 100) {
-                errors.push("Email must not exceed 100 characters.");
-            } else if (!emailPattern.test(email)) {
-                errors.push("Email format is invalid.");
-            }
-
-            return {
-                isValid: errors.length === 0,
-                errors: errors,
-                sanitizedUsername: sanitizeString(username),
-                sanitizedEmail: sanitizeString(email)
-            };
-        }
-
-        // Navigation
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            if (btnElement) {
-                btnElement.classList.add('active');
-            }
-            const target = document.getElementById(tabId);
-            if (target) {
-                target.classList.add('active');
-            }
-        }
-
-        function showNotification(msg, type) {
-            const banner = document.getElementById('globalNotification');
-            banner.className = `notification ${type}`;
-            banner.textContent = msg;
-            banner.style.display = 'block';
-            setTimeout(() => { banner.style.display = 'none'; }, 7000);
-        }
-
-        // Load Preset into form
         function loadPreset(username, email) {
             document.getElementById('username').value = username;
             document.getElementById('email').value = email;
-            document.getElementById('userCharCount').textContent = `${username.length}/50`;
-            switchTab('tab-register', document.getElementById('tabBtnRegister'));
+            document.getElementById('userCharCount').textContent = username.length + '/50';
+            SafeVault.showToast('Loaded preset: ' + username, 'success');
         }
 
-        // Guided Missions Handlers (Resolving Issue 2)
-        function runMission1() {
-            loadPreset('carol_vault', 'carol@safevault.local');
-            showNotification('Mission 1: Form pre-filled with valid user. Click "Execute Secure Submission Cycle" or let it run automatically.', 'success');
-            setTimeout(() => {
-                document.getElementById('vaultForm').dispatchEvent(new Event('submit'));
-            }, 600);
-        }
-
-        function runMission2() {
-            loadPreset("' OR '1'='1", "sqli_probe@test.local");
-            showNotification('Mission 2: SQLi tautology attack loaded. Watch Step 2 bind it as literal parameter without query alteration.', 'error');
-            setTimeout(() => {
-                document.getElementById('vaultForm').dispatchEvent(new Event('submit'));
-            }, 600);
-        }
-
-        function runMission3() {
-            loadPreset("<script>alert('XSS')</script>", "xss_probe@test.local");
-            showNotification('Mission 3: XSS script tag payload loaded. Watch Step 1 strip and encode HTML entities to neutralize script execution.', 'error');
-            setTimeout(() => {
-                document.getElementById('vaultForm').dispatchEvent(new Event('submit'));
-            }, 600);
-        }
-
-        function runMission4() {
-            switchTab('tab-tests', document.getElementById('tabBtnTests'));
-            showNotification('Mission 4: Switched to Vulnerability Attack Playground. Executing all 8 NUnit tests...', 'success');
-            setTimeout(() => {
-                runAutomatedSecuritySuite();
-            }, 500);
-        }
-
-        // Real-time character count
         document.getElementById('username').addEventListener('input', function() {
-            document.getElementById('userCharCount').textContent = `${this.value.length}/50`;
+            document.getElementById('userCharCount').textContent = this.value.length + '/50';
         });
 
-        // Form Submit Execution Cycle
-        document.getElementById('vaultForm').addEventListener('submit', async function(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
-            const startTime = performance.now();
-            const rawUsername = document.getElementById('username').value;
-            const rawEmail = document.getElementById('email').value;
+            const form = document.getElementById('vaultForm');
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
 
-            // Pipeline Step 1 Visualization
-            const validation = validateInputs(rawUsername, rawEmail);
-            
-            document.getElementById('inspectSanitized').innerHTML = 
-                `<strong>Raw Input:</strong>        ${escapeHtml(rawUsername)}\n` +
-                `<strong>Sanitized Output:</strong>  ${escapeHtml(validation.sanitizedUsername)}\n` +
-                `<strong>Email Address:</strong>     ${escapeHtml(rawEmail)}\n` +
-                `<strong>Validation Status:</strong>  ${validation.isValid ? '<span style="color:var(--accent-emerald); font-weight:700;">VALID (Compliant)</span>' : '<span style="color:var(--accent-rose); font-weight:700;">REJECTED (' + validation.errors.join(', ') + ')</span>'}`;
+            document.getElementById('pipelineStatus').textContent = 'Processing...';
 
-            // Pipeline Step 2: Parameterized SQL Representation
-            document.getElementById('inspectParams').innerHTML = 
-                `// Bound Parameters via SqliteParameter:\n` +
-                `@Username = "${escapeHtml(rawUsername)}" (Type: String, literal placeholder)\n` +
-                `@Email    = "${escapeHtml(rawEmail)}" (Type: String)\n` +
-                `// Note: User string is never interpolated, neutralizing SQL injection.`;
+            await SafeVault.submitUserIntake(form, function(val) {
+                document.getElementById('inspectSanitized').textContent = 
+                    'Raw Username: ' + val.rawUsername + '\n' +
+                    'Sanitized Output: ' + val.sanitizedUsername + '\n' +
+                    'HTML Entity Encoded: ' + val.encodedUsername + '\n' +
+                    'Validation Status: ' + (val.isValid ? 'VALID (Compliant)' : 'REJECTED: ' + val.errors.join(', '));
 
-            const isStaticHost = window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io');
-            let executedBackend = false;
+                document.getElementById('inspectParams').textContent = 
+                    'SqliteCommand query = "INSERT INTO Users (Username, Email) VALUES (@Username, @Email);"\n' +
+                    'Parameters:\n' +
+                    '  @Username = "' + val.sanitizedUsername + '" (Type: Text, Literal data value)\n' +
+                    '  @Email = "' + val.encodedEmail + '" (Type: Text, Literal data value)';
 
-            if (!isStaticHost) {
-                try {
-                    const res = await fetch('/submit', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: validation.sanitizedUsername, email: validation.sanitizedEmail })
-                    });
-                    if (res.status === 200 || res.status === 400) {
-                        executedBackend = true;
-                    }
-                } catch (err) {
-                    executedBackend = false;
-                }
-            }
+                document.getElementById('inspectResult').textContent = val.isValid 
+                    ? 'Success: Record committed to SQLite Users table with zero dynamic concatenation.' 
+                    : 'Blocked: Form input rejected prior to database command execution.';
 
-            const elapsed = (performance.now() - startTime).toFixed(1);
-            document.getElementById('inspectElapsed').textContent = `${elapsed} ms`;
-
-            if (validation.isValid) {
-                const newId = databaseStore.length ? Math.max(...databaseStore.map(u => u.userId)) + 1 : 1;
-                databaseStore.push({
-                    userId: newId,
-                    username: validation.sanitizedUsername,
-                    email: rawEmail,
-                    defense: "SqliteParameter Bound + HtmlEncode",
-                    isClean: true
-                });
-                saveDatabase();
-
-                document.getElementById('pipelineStatus').textContent = "Protected (200 OK)";
-                document.getElementById('pipelineStatus').className = "badge pass";
-                document.getElementById('inspectResult').innerHTML = 
-                    `<span style="color:var(--accent-emerald); font-weight:700;">SUCCESS: User record successfully inserted with UserID ${newId}.</span>\n` +
-                    `Runtime Mode: ${executedBackend ? 'ASP.NET Core Backend API' : 'In-Browser Secure SQLite Simulation'}\n` +
-                    `Defense Action: Parameterized binding guaranteed safe insertion.`;
-
-                showNotification(`User successfully registered with UserID ${newId}!`, 'success');
-            } else {
-                const isAttackPayload = rawUsername.includes("'") || rawUsername.includes("<") || rawUsername.includes(";");
-                document.getElementById('pipelineStatus').textContent = isAttackPayload ? "Attack Neutralized" : "Validation Blocked";
-                document.getElementById('pipelineStatus').className = "badge blocked";
-
-                document.getElementById('inspectResult').innerHTML = 
-                    `<span style="color:var(--accent-rose); font-weight:700;">SECURITY DEFENSE ACTIVATED</span>\n` +
-                    `Reason(s): ${validation.errors.join("; ")}\n` +
-                    `Defense Action: Input was rejected at perimeter validation before reaching SQL execution.`;
-
-                showNotification(`Defense Block: ${validation.errors.join(' ')}`, 'error');
-            }
-        });
-
-        // Table Rendering
-        function renderUserTable(filteredList = null) {
-            const list = filteredList || databaseStore;
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = '';
-
-            if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 28px;">No user records match the query.</td></tr>`;
-                return;
-            }
-
-            list.forEach(user => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-family: var(--font-mono); color: var(--text-muted); font-weight: 700;">#${user.userId}</td>
-                    <td style="font-weight: 700; font-family: var(--font-mono); color: var(--text-primary);">${escapeHtml(user.username)}</td>
-                    <td style="color: var(--text-secondary);">${escapeHtml(user.email)}</td>
-                    <td><span class="badge ${user.isClean ? 'pass' : 'blocked'}">${user.isClean ? 'Verified Clean' : 'Attack Vector Isolated'}</span></td>
-                    <td style="font-size: 0.85rem; color: var(--accent-cyan); font-family: var(--font-mono);">${user.defense}</td>
-                `;
-                tbody.appendChild(tr);
+                document.getElementById('pipelineStatus').textContent = val.isValid ? 'Committed' : 'Rejected';
+                submitBtn.disabled = false;
             });
         }
-
-        // Parameterized Lookup Function
-        function executeLookup() {
-            const query = document.getElementById('queryUsername').value.trim();
-            const feedback = document.getElementById('lookupFeedback');
-
-            if (!query) {
-                renderUserTable();
-                feedback.style.display = 'none';
-                return;
-            }
-
-            // In parameterized queries, query string is matched as a literal string value
-            const matched = databaseStore.filter(u => u.username === query);
-            renderUserTable(matched);
-
-            feedback.style.display = 'block';
-            if (matched.length > 0) {
-                feedback.innerHTML = `✓ Parameterized lookup match: Found ${matched.length} record(s) where Username = '${escapeHtml(query)}'`;
-            } else {
-                feedback.innerHTML = `🛡️ Parameterized lookup: 0 records found for literal parameter '${escapeHtml(query)}'. (The query treated the payload strictly as literal text, preventing unauthorized record dump).`;
-            }
-        }
-
-        // Automated Test Suite Execution
-        async function runAutomatedSecuritySuite() {
-            const btn = document.getElementById('btnRunSuite');
-            btn.disabled = true;
-            btn.textContent = "Running Security Assertions...";
-
-            const tests = [
-                { id: "sqli", name: "TestForSQLInjection()", pass: true },
-                { id: "xss", name: "TestForXSS()", pass: true },
-                { id: "val-user", name: "TestValidInput_PassesValidation()", pass: true },
-                { id: "bound-user", name: "TestInvalidInput (Length Limits)", pass: true },
-                { id: "chars-user", name: "TestInvalidInput (Regex Pattern)", pass: true },
-                { id: "empty-email", name: "TestInvalidInput (Empty Email)", pass: true },
-                { id: "fmt-email", name: "TestInvalidInput (Invalid Email)", pass: true },
-                { id: "table-intact", name: "TestTableIntegrity", pass: true }
-            ];
-
-            for (const t of tests) {
-                await new Promise(r => setTimeout(r, 140));
-                const badge = document.getElementById(`badge-${t.id}`);
-                badge.className = "badge pass";
-                badge.textContent = "PASSED";
-            }
-
-            const summary = document.getElementById('suiteSummary');
-            summary.style.display = "block";
-            summary.className = "notification success";
-            summary.innerHTML = "✓ All 8 Security Tests Passed (100% Success Rate) · Zero Vulnerabilities Found · SQL Injection Blocked · XSS Neutralized";
-
-            btn.disabled = false;
-            btn.textContent = "Re-run Test Suite (8/8 Passed)";
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        // Initialize table on load
-        renderUserTable();
     </script>
 </body>
 </html>
