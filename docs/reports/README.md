@@ -1,36 +1,37 @@
 # SafeVault · Activity Completion Reports
 
-This directory serves as the permanent repository archive for **Activity Completion Reports** across all development cycles of the SafeVault capstone project (Microsoft Full Stack Developer Specialization — Course 8: *Security and Authentication*).
+This directory serves as the repository archive for **Activity Completion Reports** across all development cycles of the SafeVault capstone project (Microsoft Full Stack Developer Specialization — Course 8: *Security and Authentication*).
 
 ---
 
-## Purpose & Governance
+## Purpose & Delivery Workflow
 
-In alignment with production engineering standards and lab deployment guidelines:
-1. **Activity Lifecycle Gate**: Upon the successful completion, gate verification, and merge of each Activity pull request, a structured Completion Report is compiled and committed directly to `main`.
-2. **Knowledge & Evolution Persistence**: These reports document the architectural decisions, design evolution, user feedback iterations, and technical debugging methodologies that shaped the final deliverable.
-3. **Traceability**: Every report cross-references commit SHAs, pull requests, automated test outputs, visual artifacts, and external handoff archives.
+In alignment with repository engineering standards:
+1. **Branch & Pull Request Delivery**: Every Activity Completion Report and report update is committed on a dedicated activity or review branch and delivered through a Pull Request reviewed and merged by `jdsaire`. Reports are never committed directly to `main`.
+2. **Architecture & Evolution Record**: Each report documents the architectural decisions, iterative refinements, and technical debugging steps verified in the codebase.
+3. **Evidence Provenance (`[M]` vs. `[SIM]`)**: Every report cross-references commit SHAs, pull requests, and automated `.NET 8` / NUnit test outputs, explicitly separating measured execution (`[M]`) from simulated attack payloads or browser fallback behavior (`[SIM]`).
 
 ---
 
 ## Report Schema Standard
 
-Each Activity Completion Report adheres to the following structural schema:
-- **1. Executive Summary**: High-level overview of objectives, outcomes, and milestone achievements.
-- **2. Capstone Rubric & Criteria Mapping**: Explicit alignment against specialization grading criteria (C1 through C6).
-- **3. Evolution & Iteration History**: Chronological progression from initial scaffolding through feedback-driven refinements.
-- **4. Technical Debugging Deep Dive & Root Cause Analysis**: Forensic documentation of unexpected defects, browser parser behaviors, data layer issues, and architectural resolutions.
-- **5. Security Telemetry & Automated Verification**: Comprehensive test execution metrics, NUnit console traces, and attack vector coverage.
-- **6. Component Architecture**: Breakdown of source files, data repositories, frontend interfaces, and shared libraries.
-- **7. Activity Boundary Protocol**: Explicit demarcation isolating the completed activity from subsequent capstone activities.
-- **8. Artifact & Verification Digest**: Complete audit ledger of commits, PRs, live deployments, and drive archives.
+Each Activity Completion Report follows a consistent nine-section structure:
+- **1. Executive Summary**: Overview of objectives, outcomes, and milestone deliverables.
+- **2. Course 8 Capstone Rubric Alignment**: Verbatim mapping against the six Course 8 capstone rubric criteria (`C1` through `C6`, 5 points each) without self-awarded scores.
+- **3. Chronological Evolution & Iteration History**: Progression of commits and pull requests across the activity.
+- **4. Technical Debugging Deep Dive & Root Cause Analysis**: Root cause analysis and verification of defects resolved during the activity (`[M]` vs. `[SIM]`).
+- **5. Security Telemetry & Automated Test Suite Audit**: Measured NUnit console output (`[M]`) and attack vector coverage tables.
+- **6. Component Architecture**: Breakdown of backend services, data repositories, test fixtures, and frontend workspaces.
+- **7. Scope Boundaries**: Explicit demarcation between the completed activity and subsequent capstone activities.
+- **8. Artifact & Verification Audit Ledger**: Audit ledger of commits, pull requests, build/test verifications (`[M]`), and interactive demo surfaces (`[SIM]`).
+- **9. Author & AI Assistance Disclosure Attestation**: Sole authorship attestation (`jdsaire`) and generic disclosure of how an AI environment assisted during the activity.
 
 ---
 
 ## Activity Reports Index
 
-| Activity ID | Title | Status | Pull Requests | Author | Date | Report Link |
+| Activity ID | Title | Code Status | Pull Requests | Author | Date | Report Link |
 |---|---|---|---|---|---|---|
-| **C8-ACT1** | Input Validation, Parameterized Queries & Multipage Architecture | **COMPLETE** | PR #1, PR #2, PR #3 | Juan Diego S. | Nov 2026 | [ACTIVITY-1-COMPLETION-REPORT.md](ACTIVITY-1-COMPLETION-REPORT.md) |
-| **C8-ACT2** | Authentication & Role-Based Access Control (RBAC) | **COMPLETE** | PR #4 | Juan Diego S. | Nov 2026 | [ACTIVITY-2-COMPLETION-REPORT.md](ACTIVITY-2-COMPLETION-REPORT.md) |
-| **C8-ACT3** | Security Debugging & Capstone Evaluation Summary | *Pending* | — | Juan Diego S. | *Upcoming* | *Scheduled for final run* |
+| **C8-ACT1** | Input Validation, Parameterized Queries & Multipage Architecture | Completed on `main` (`eb99ab5`) | [#1](https://github.com/jdsaire/fullstack_c8_safevault/pull/1), [#2](https://github.com/jdsaire/fullstack_c8_safevault/pull/2), [#3](https://github.com/jdsaire/fullstack_c8_safevault/pull/3) | Juan Diego S. | Nov 2026 | [ACTIVITY-1-COMPLETION-REPORT.md](ACTIVITY-1-COMPLETION-REPORT.md) |
+| **C8-ACT2** | Authentication & Role-Based Access Control (RBAC) | Completed on `main` (`feedc6a`) | [#4](https://github.com/jdsaire/fullstack_c8_safevault/pull/4) | Juan Diego S. | Nov 2026 | [ACTIVITY-2-COMPLETION-REPORT.md](ACTIVITY-2-COMPLETION-REPORT.md) |
+| **C8-ACT3** | Security Debugging, Vulnerability Remediation & Capstone Summary | Code completed on `main` (`52227f2`) | [#5](https://github.com/jdsaire/fullstack_c8_safevault/pull/5) | Juan Diego S. | Nov 2026 | *Report pending next run* |
