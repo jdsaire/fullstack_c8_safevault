@@ -59,8 +59,8 @@
                     </p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <span class="telemetry-status" id="testSuiteBadge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; font-size: 14px; padding: 6px 14px;">
-                        28 / 28 Tests Passed (100%)
+                    <span class="telemetry-status" id="testSuiteBadge" style="font-size: 14px; padding: 6px 14px;">
+                        Idle
                     </span>
                     <button type="button" class="btn btn-primary" id="runAllTestsBtn" onclick="triggerTestExecution()">
                         ▶ Run All 28 NUnit Tests
@@ -70,12 +70,12 @@
         </section>
 
         <!-- Test Results Grid -->
-        <section aria-labelledby="resultsHeading">
+        <section aria-labelledby="resultsHeading" style="margin-bottom: 32px;">
             <h2 id="resultsHeading" style="font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 14px;">
                 Executed NUnit Test Assertions (8 Activity 1 + 10 Activity 2 + 10 Activity 3)
             </h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px;" id="testsContainer">
-                <!-- Populated dynamically on load and on click by triggerTestExecution() -->
+                <div class="step-output" style="grid-column: 1 / -1;">// Awaiting form submission...</div>
             </div>
         </section>
 
@@ -85,8 +85,8 @@
                 <div class="telemetry-header">
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Cycle 4 Telemetry &amp; NUnit Execution Console</h3>
-                        <span class="telemetry-status" id="telemetryStatus">All 28 Tests Passed</span>
+                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Idle</span>
                     </div>
                     <div class="telemetry-actions">
                         <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
@@ -96,52 +96,12 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Runner: <strong id="telemetryTarget">NUnit 3.14 / VSTest 17.11 (.NET 8.0)</strong></span>
+                        <span>Status: <strong id="telemetryTarget">—</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
-                        <span>Latency: <strong id="telemetryLatency">6.85s</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// SafeVault NUnit 3 Test Execution Trace (28 Tests)
-// Command: dotnet test SafeVault.sln -c Release --logger "console;verbosity=detailed"
-
-Test run for SafeVault/Tests/bin/Release/net8.0/Tests.dll (.NETCoreApp,Version=v8.0)
-NUnit Adapter 4.5.0.0: Test execution started
-Running all tests in Tests/bin/Release/net8.0/Tests.dll
-   NUnit3TestExecutor discovered 28 of 28 NUnit test cases using Current Discovery mode, Non-Explicit run
-  Passed TestForSQLInjection [4 ms]
-  Passed TestForXSS [2 ms]
-  Passed TestInvalidInput_FailsValidation("","user@test.com","Username is required.") [&lt; 1 ms]
-  Passed TestInvalidInput_FailsValidation("ab","user@test.com","Username must be between 3 and 50 characters.") [&lt; 1 ms]
-  Passed TestInvalidInput_FailsValidation("invalid user name with spaces","user@test.com","Username contains invalid characters.") [&lt; 1 ms]
-  Passed TestInvalidInput_FailsValidation("valid_user","","Email is required.") [&lt; 1 ms]
-  Passed TestInvalidInput_FailsValidation("valid_user","not-an-email","Email format is invalid.") [&lt; 1 ms]
-  Passed TestValidInput_PassesValidation [&lt; 1 ms]
-  Passed TestLogin_InvalidPassword_RejectsWithUnauthorized [412 ms]
-  Passed TestLogin_NonExistentUser_RejectsSafelyWithoutEnumeration [698 ms]
-  Passed TestLogin_SqlInjectionPayloads_AreNeutralized [1 s]
-  Passed TestLogin_ValidCredentials_AuthenticatesAndIssuesSignedToken [131 ms]
-  Passed TestPasswordHashing_GeneratesUniqueSaltsAndVerifiesCorrectly [982 ms]
-  Passed TestRbac_AdminRole_GrantedAccessToAdminDashboardAndRoleManagement [191 ms]
-  Passed TestRbac_AuditorRole_GrantedAuditLogsButDeniedAdminDashboard [142 ms]
-  Passed TestRbac_InvalidRoleOrWeakPassword_RejectedDuringRegistration [2 ms]
-  Passed TestRbac_StandardUserRole_DeniedAccessToAdminDashboard [124 ms]
-  Passed TestRbac_UnauthenticatedOrTamperedToken_DeniedWith401 [128 ms]
-  Passed TestEmailValidation_RejectsEmbeddedXssAndSqlPayloads [2 ms]
-  Passed TestSanitize_StripsObfuscatedEventsControlCharsAndProtocols [2 ms]
-  Passed TestParameterizedSearch_BlocksSqlInjectionAndEscapesWildcards [4 ms]
-  Passed TestUniqueUsernameConstraint_PreventsDuplicateIntakeAndRegistration [3 ms]
-  Passed TestSchemaMigration_RejectsUnwhitelistedColumnIdentifier [1 ms]
-  Passed TestSessionToken_RejectsPipeDelimiterInjectionInUsername [1 ms]
-  Passed TestPasswordHasher_EnforcesStandardWorkFactorBounds [2 ms]
-  Passed TestAuthAndLookup_RejectsNullBytesAndOversizedPayloads [278 ms]
-  Passed TestSecurityAuditService_DistinguishesMeasuredAndSimulatedFindings [3 ms]
-  Passed TestEndToEndRegression_AllSecurityLayersRemainIntact [384 ms]
-
-Test Run Successful.
-Total tests: 28
-     Passed: 28
-     Failed: 0
- Total time: 6.8512 Seconds</code></pre>
+                        <pre><code id="telemetryCode">// Awaiting form submission...</code></pre>
                     </div>
                 </div>
             </div>
@@ -208,15 +168,13 @@ Total tests: 28
                 },
                 function(results, passedCount, totalCount) {
                     badge.textContent = `${passedCount} / ${totalCount} Tests Passed (100%)`;
+                    badge.style.background = 'rgba(52, 211, 153, 0.15)';
+                    badge.style.color = '#34d399';
                     btn.disabled = false;
                     btn.textContent = '▶ Run All 28 NUnit Tests';
                 }
             );
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            triggerTestExecution();
-        });
     </script>
 </body>
 </html>

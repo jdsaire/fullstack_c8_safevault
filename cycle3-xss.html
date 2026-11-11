@@ -79,7 +79,7 @@
                         <label for="xssPayload" class="form-label">
                             <span>Malicious Input String <span class="req" aria-hidden="true">*</span></span>
                         </label>
-                        <input type="text" id="xssPayload" name="xssPayload" class="form-control" required value="<script>alert('XSS')</script>" style="font-family: var(--font-mono); color: #fbbf24;">
+                        <input type="text" id="xssPayload" name="xssPayload" class="form-control" required placeholder="e.g. &lt;script&gt;alert('XSS')&lt;/script&gt;" style="font-family: var(--font-mono); color: #fbbf24;">
                         <p class="form-hint">Submit any executable JavaScript payload to inspect sanitization and entity transformations.</p>
                     </div>
 
@@ -95,7 +95,7 @@
                     <h2 class="card-title" id="sanitizationTitle">
                         <span aria-hidden="true">🔬</span> Sanitization Pipeline Breakdown
                     </h2>
-                    <span class="telemetry-status" id="xssStatus">Active</span>
+                    <span class="telemetry-status" id="xssStatus">Idle</span>
                 </div>
 
                 <div class="pipeline-step">
@@ -103,7 +103,7 @@
                         <span class="step-name">Stage 1: Client DOM Sanitization</span>
                         <span class="step-method">Tag Stripping</span>
                     </div>
-                    <div class="step-output" id="inspectClientSanitized">// Awaiting payload...</div>
+                    <div class="step-output" id="inspectClientSanitized">// Awaiting form submission...</div>
                 </div>
 
                 <div class="pipeline-step">
@@ -111,7 +111,7 @@
                         <span class="step-name">Stage 2: Server HTML Entity Encoding</span>
                         <span class="step-method">WebUtility.HtmlEncode</span>
                     </div>
-                    <div class="step-output" id="inspectServerEncoded">// Awaiting payload...</div>
+                    <div class="step-output" id="inspectServerEncoded">// Awaiting form submission...</div>
                 </div>
 
                 <div class="pipeline-step">
@@ -119,10 +119,7 @@
                         <span class="step-name">Safe Browser DOM Rendering</span>
                         <span class="step-method">Inert Glyph Output</span>
                     </div>
-                    <div class="step-output" style="background: #040810; border-color: #27374f;">
-                        <span style="color: var(--text-muted); font-size: 13px; display: block; margin-bottom: 4px;">Rendered View (Safe text glyphs, zero JavaScript execution):</span>
-                        <div id="inspectDomRender" style="font-size: 15px; color: #ffffff; padding: 4px 0; font-family: var(--font-sans);"></div>
-                    </div>
+                    <div class="step-output" id="inspectDomRender">// Awaiting form submission...</div>
                 </div>
             </section>
 
@@ -178,8 +175,8 @@
                 <div class="telemetry-header">
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Cycle 3 Telemetry & Generated Code Inspector</h3>
-                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Idle</span>
                     </div>
                     <div class="telemetry-actions">
                         <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
@@ -189,13 +186,12 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Target: <strong id="telemetryTarget">Cycle 3 XSS Defense</strong></span>
+                        <span>Status: <strong id="telemetryTarget">—</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
                         <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// Execute an XSS payload test above to inspect the exact entity transformation
-// and encoding telemetry in this quarantined panel.</code></pre>
+                        <pre><code id="telemetryCode">// Awaiting form submission...</code></pre>
                     </div>
                 </div>
             </div>
@@ -220,12 +216,16 @@
     <script>
         function loadXssPreset(payload) {
             document.getElementById('xssPayload').value = payload;
-            handleXssSubmit();
+            SafeVault.showToast('Loaded XSS preset into form. Click Execute to run sanitization.', 'success');
         }
 
         function handleXssSubmit(e) {
             if (e) e.preventDefault();
-            const payload = document.getElementById('xssPayload').value;
+            const payload = document.getElementById('xssPayload').value.trim();
+            if (!payload) {
+                SafeVault.showToast('Please enter or select an XSS payload before submitting.', 'warning');
+                return;
+            }
             const res = SafeVault.testXssMitigation(payload);
 
             document.getElementById('inspectClientSanitized').textContent = 
@@ -239,13 +239,10 @@
                 'Entities: < -> &lt; | > -> &gt; | " -> &quot; | \' -> &#39;';
 
             // Safely set textContent to show glyphs without executing
-            document.getElementById('inspectDomRender').textContent = res.encodedUsername;
+            document.getElementById('inspectDomRender').textContent =
+                'Rendered View (Safe text glyphs, zero JavaScript execution): ' + (res.encodedUsername || '(empty string after stripping)');
             document.getElementById('xssStatus').textContent = 'XSS Neutralized';
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            handleXssSubmit();
-        });
     </script>
 </body>
 </html>
