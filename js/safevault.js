@@ -667,12 +667,6 @@ await cmd.ExecuteNonQueryAsync();`;
         if (codeEl) {
             codeEl.textContent = generatedCode;
         }
-
-        try {
-            sessionStorage.setItem('safevault_last_telemetry', JSON.stringify({
-                actionName, target, generatedCode, status, latency, time: new Date().toLocaleTimeString()
-            }));
-        } catch (e) {}
     }
 
     function toggleTelemetryPanel() {
@@ -715,7 +709,7 @@ await cmd.ExecuteNonQueryAsync();`;
             statusEl.className = 'telemetry-status';
         }
         if (codeEl) {
-            codeEl.textContent = '// Telemetry reset. Execute any cycle action to generate fresh execution traces.';
+            codeEl.textContent = '// Awaiting form submission...';
         }
         try {
             sessionStorage.removeItem('safevault_last_telemetry');
@@ -1583,13 +1577,6 @@ Total tests: ${tests.length}
     document.addEventListener('DOMContentLoaded', () => {
         renderUserTable();
         renderAuthUserTable();
-        try {
-            const last = sessionStorage.getItem('safevault_last_telemetry');
-            if (last) {
-                const t = JSON.parse(last);
-                recordTelemetry(t.actionName, t.target, t.generatedCode, t.status, t.latency);
-            }
-        } catch (e) {}
     });
 
 })(window);

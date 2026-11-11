@@ -56,7 +56,7 @@
                     <h2 class="card-title" id="sessionCardTitle">
                         <span aria-hidden="true">🪪</span> Active Principal & Route Gate Controller
                     </h2>
-                    <span id="activeRoleBadge"><span class="role-badge admin">Admin</span></span>
+                    <span id="activeRoleBadge"><span class="telemetry-status">Idle</span></span>
                 </div>
 
                 <!-- Step 1: Select Principal Identity -->
@@ -65,7 +65,7 @@
                         1. Select Session Identity (Simulates Logged-In Role):
                     </span>
                     <div class="preset-group" id="identityButtons">
-                        <button type="button" class="preset-pill active" id="id-admin" onclick="selectPrincipal('admin')">admin_vault (Admin)</button>
+                        <button type="button" class="preset-pill" id="id-admin" onclick="selectPrincipal('admin')">admin_vault (Admin)</button>
                         <button type="button" class="preset-pill" id="id-auditor" onclick="selectPrincipal('auditor')">carol_audit (Auditor)</button>
                         <button type="button" class="preset-pill" id="id-user" onclick="selectPrincipal('user')">alice_vault (User)</button>
                         <button type="button" class="preset-pill" id="id-tampered" onclick="selectPrincipal('tampered')">Tampered Token (Escalation Attempt)</button>
@@ -77,9 +77,9 @@
                 <div class="pipeline-step">
                     <div class="step-header">
                         <span class="step-name">Authorization Bearer Token (HMAC-SHA256)</span>
-                        <span class="step-method" id="tokenValidityLabel">Valid Signature</span>
+                        <span class="step-method" id="tokenValidityLabel">Idle</span>
                     </div>
-                    <div class="step-output" id="activeTokenDisplay" style="font-size: 13px; color: #38bdf8;"></div>
+                    <div class="step-output" id="activeTokenDisplay" style="font-size: 13px; color: #38bdf8;">// Awaiting form submission...</div>
                 </div>
 
                 <!-- Step 2: Probe Protected Routes -->
@@ -110,21 +110,21 @@
                     <h2 class="card-title" id="resourceViewportTitle">
                         <span aria-hidden="true">🖥️</span> Protected Resource Viewport
                     </h2>
-                    <span class="http-badge http-200" id="rbacHttpBadge">200 OK · Access Granted</span>
+                    <span class="telemetry-status" id="rbacHttpBadge">Idle</span>
                 </div>
 
                 <!-- Gate Decision Summary -->
                 <div class="pipeline-step" id="decisionBanner">
                     <div class="step-header">
-                        <span class="step-name" id="decisionRouteLabel">Target: /api/admin/dashboard</span>
+                        <span class="step-name" id="decisionRouteLabel">Target: —</span>
                         <span class="step-method">AuthorizationService.cs</span>
                     </div>
-                    <div class="step-output" id="decisionSummaryOutput"></div>
+                    <div class="step-output" id="decisionSummaryOutput">// Awaiting form submission...</div>
                 </div>
 
                 <!-- Dynamic Protected View Container -->
                 <div id="protectedResourceContainer" style="margin-top: 16px;">
-                    <!-- Rendered dynamically based on RBAC decision -->
+                    <div class="step-output">// Awaiting form submission...</div>
                 </div>
             </section>
 
@@ -160,7 +160,7 @@
                             <td><span class="http-badge http-401">401 Unauthorized</span></td>
                         </tr>
                         <tr>
-                            <td><code>POST /api/admin/users/{user}/role</code> (Role Assignment)</td>
+                            <td><code>POST /api/admin/users/role</code> (Role Assignment)</td>
                             <td><span class="http-badge http-200">200 OK (Granted)</span></td>
                             <td><span class="http-badge http-403">403 Forbidden</span></td>
                             <td><span class="http-badge http-403">403 Forbidden</span></td>
@@ -191,8 +191,8 @@
                 <div class="telemetry-header">
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Cycle 6 Telemetry & RBAC Policy Inspector</h3>
-                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Idle</span>
                     </div>
                     <div class="telemetry-actions">
                         <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
@@ -202,13 +202,12 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Target: <strong id="telemetryTarget">Cycle 6 RBAC Gate</strong></span>
+                        <span>Status: <strong id="telemetryTarget">—</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
                         <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// Select any session identity and probe a protected route above to inspect
-// the exact C# AuthorizationService token and role evaluation trace.</code></pre>
+                        <pre><code id="telemetryCode">// Awaiting form submission...</code></pre>
                     </div>
                 </div>
             </div>
@@ -231,7 +230,7 @@
     <!-- SafeVault Shared Security Engine -->
     <script src="js/safevault.js"></script>
     <script>
-        let currentPrincipalKey = 'admin';
+        let currentPrincipalKey = null;
         let currentRoute = '/api/admin/dashboard';
         let activeBearerToken = null;
 
@@ -287,10 +286,14 @@
                 validityLabel.textContent = 'Missing Token';
             }
 
-            probeRoute(currentRoute);
+            SafeVault.showToast('Session identity selected. Click an endpoint in Step 2 to probe RBAC access.', 'success');
         }
 
         function probeRoute(routePath) {
+            if (!currentPrincipalKey) {
+                SafeVault.showToast('Please select a Session Identity in Step 1 before probing a route.', 'warning');
+                return;
+            }
             currentRoute = routePath;
             const decision = SafeVault.evaluateRbacRoute(activeBearerToken, routePath);
             const httpBadge = document.getElementById('rbacHttpBadge');
@@ -334,7 +337,7 @@
                             <span class="role-badge admin">Admin Controls Active</span>
                         </div>
                         <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">
-                            Modify user RBAC roles below via <code>POST /api/admin/users/{username}/role</code>:
+                            Modify user RBAC roles below via <code>POST /api/admin/users/role</code>:
                         </p>
                         <div style="display: grid; gap: 10px;">
                             ${users.map(u => `
@@ -413,10 +416,6 @@
                 SafeVault.showToast(res.message, 'error');
             }
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            selectPrincipal('admin');
-        });
     </script>
 </body>
 </html>

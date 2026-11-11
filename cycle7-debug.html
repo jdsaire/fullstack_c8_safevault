@@ -56,7 +56,7 @@
                     <h2 class="card-title" id="probeCardTitle">
                         <span aria-hidden="true">🛠️</span> Vulnerability &amp; Remediation Probe Simulator
                     </h2>
-                    <span id="probeProvenanceBadge" class="provenance-badge measured">Identified in Codebase [M]</span>
+                    <span id="probeProvenanceBadge" class="telemetry-status">Idle</span>
                 </div>
 
                 <div style="margin-bottom: 14px;">
@@ -64,7 +64,7 @@
                         Select Vulnerability Vector Preset ([M] Measured vs [SIM] Simulated):
                     </span>
                     <div class="preset-group" style="margin-bottom: 12px;">
-                        <button type="button" class="preset-pill active" id="presetV1Email" onclick="selectProbePreset('email', '<script>@evil.com', 'presetV1Email')">
+                        <button type="button" class="preset-pill" id="presetV1Email" onclick="selectProbePreset('email', '<script>@evil.com', 'presetV1Email')">
                             V1: Email XSS &lt;script&gt;@evil.com [M]
                         </button>
                         <button type="button" class="preset-pill" id="presetV1Xss" onclick="selectProbePreset('xss', '<div onmouseover=alert(1)><a href=&quot;java\tscript:alert(1)&quot;>hover</a></div>', 'presetV1Xss')">
@@ -89,7 +89,7 @@
                     <label for="probeVectorSelect" class="form-label">
                         <span>Target Defense Surface</span>
                     </label>
-                    <select id="probeVectorSelect" class="form-control" onchange="executeCurrentProbe()">
+                    <select id="probeVectorSelect" class="form-control">
                         <option value="email">V1 [M] · Strict Email Regex &amp; Disallowed Character Guard</option>
                         <option value="xss">V1/S2 [M/SIM] · Control-Char, Event-Handler &amp; URI Sanitizer</option>
                         <option value="search">V2 [M] · Parameterized Search with ESCAPE '\' Wildcard Guard</option>
@@ -101,10 +101,10 @@
                 <div class="form-group">
                     <label for="probePayloadInput" class="form-label">
                         <span>Attack or Boundary Payload</span>
-                        <span class="char-count" id="probeVerdictTag" style="color: #34d399;">Attack Blocked</span>
+                        <span class="char-count" id="probeVerdictTag">Idle</span>
                     </label>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="probePayloadInput" class="form-control" value="<script>@evil.com" aria-label="Attack payload to probe">
+                        <input type="text" id="probePayloadInput" class="form-control" placeholder="e.g. &lt;script&gt;@evil.com" aria-label="Attack payload to probe">
                         <button type="button" class="btn btn-primary" onclick="executeCurrentProbe()">
                             Execute Probe
                         </button>
@@ -118,21 +118,21 @@
                             ❌ Vulnerable Pattern (Pre-Remediation / Simulated Baseline)
                         </span>
                     </div>
-                    <div class="diff-box vulnerable" id="vulnerableCodeBox"></div>
+                    <div class="diff-box vulnerable" id="vulnerableCodeBox">// Awaiting form submission...</div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                         <span style="font-size: 13px; font-weight: 700; color: #6ee7b7; text-transform: uppercase;">
                             ✓ Remediated SafeVault Implementation (Activity 3 Patch)
                         </span>
                     </div>
-                    <div class="diff-box remediated" id="remediatedCodeBox"></div>
+                    <div class="diff-box remediated" id="remediatedCodeBox">// Awaiting form submission...</div>
 
                     <div class="pipeline-step" style="margin-bottom: 0;">
                         <div class="step-header">
                             <span class="step-name">Remediation Verdict &amp; Sanitized/Bound Output</span>
-                            <span class="http-badge http-200" id="probeStatusBadge">BLOCKED &amp; NEUTRALIZED</span>
+                            <span class="telemetry-status" id="probeStatusBadge">Idle</span>
                         </div>
-                        <div style="font-size: 14.5px; color: var(--text-primary); margin-bottom: 6px;" id="probeVerdictText"></div>
+                        <div style="font-size: 14.5px; color: var(--text-primary); margin-bottom: 6px;" id="probeVerdictText">// Awaiting form submission...</div>
                         <div style="font-family: var(--font-mono); font-size: 13px; color: var(--color-primary);" id="probeBoundOutput"></div>
                     </div>
                 </div>
@@ -158,16 +158,16 @@
                         Quick Search &amp; Attack Presets:
                     </span>
                     <div class="preset-group" style="margin-bottom: 12px;">
-                        <button type="button" class="preset-pill" onclick="runDirectorySearch('alice')">
+                        <button type="button" class="preset-pill" onclick="loadSearchPreset('alice')">
                             Search "alice" (Legitimate)
                         </button>
-                        <button type="button" class="preset-pill" onclick="runDirectorySearch('audit')">
+                        <button type="button" class="preset-pill" onclick="loadSearchPreset('audit')">
                             Search "audit" (Legitimate)
                         </button>
-                        <button type="button" class="preset-pill" onclick="runDirectorySearch('%')">
+                        <button type="button" class="preset-pill" onclick="loadSearchPreset('%')">
                             Wildcard Dump Probe "%"
                         </button>
-                        <button type="button" class="preset-pill" onclick="runDirectorySearch('\' OR \'1\'=\'1')">
+                        <button type="button" class="preset-pill" onclick="loadSearchPreset('\' OR \'1\'=\'1')">
                             SQLi Tautology "' OR '1'='1"
                         </button>
                     </div>
@@ -176,10 +176,10 @@
                 <div class="form-group">
                     <label for="directorySearchInput" class="form-label">
                         <span>Search Username or Email Substring</span>
-                        <span class="char-count" id="searchMatchCountBadge">1 row matched</span>
+                        <span class="char-count" id="searchMatchCountBadge">Idle</span>
                     </label>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="directorySearchInput" class="form-control" value="alice" aria-label="Search username or email">
+                        <input type="text" id="directorySearchInput" class="form-control" placeholder="e.g. alice" aria-label="Search username or email">
                         <button type="button" class="btn btn-primary" onclick="runDirectorySearch()">
                             Search
                         </button>
@@ -190,15 +190,15 @@
                 <div class="hash-dissector" style="margin-bottom: 18px;">
                     <div class="hash-segment">
                         <span class="hash-segment-label">Raw Search Input</span>
-                        <span class="hash-segment-value" id="searchRawReadout" style="color: #f8fafc;">alice</span>
+                        <span class="hash-segment-value" id="searchRawReadout" style="color: #f8fafc;">—</span>
                     </div>
                     <div class="hash-segment">
                         <span class="hash-segment-label">Escaped LIKE Literal</span>
-                        <span class="hash-segment-value" id="searchEscapedReadout" style="color: #fbbf24;">alice</span>
+                        <span class="hash-segment-value" id="searchEscapedReadout" style="color: #fbbf24;">—</span>
                     </div>
                     <div class="hash-segment">
                         <span class="hash-segment-label">Bound @SearchPattern</span>
-                        <span class="hash-segment-value" id="searchBoundReadout" style="color: #34d399;">%alice%</span>
+                        <span class="hash-segment-value" id="searchBoundReadout" style="color: #34d399;">—</span>
                     </div>
                 </div>
 
@@ -217,7 +217,11 @@
                             </tr>
                         </thead>
                         <tbody id="searchResultTableBody">
-                            <!-- Populated by runDirectorySearch() -->
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 18px; font-family: var(--font-mono);">
+                                    // Awaiting form submission...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -265,8 +269,8 @@
                 <div class="telemetry-header">
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Cycle 7 Telemetry &amp; Remediation Code Inspector</h3>
-                        <span class="telemetry-status" id="telemetryStatus">Active</span>
+                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Idle</span>
                     </div>
                     <div class="telemetry-actions">
                         <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
@@ -276,13 +280,12 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Target: <strong id="telemetryTarget">SecurityAuditService.ExecuteRemediationProbeAsync()</strong></span>
+                        <span>Status: <strong id="telemetryTarget">—</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
-                        <span>Latency: <strong id="telemetryLatency">0.8ms</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// Select any vulnerability preset or execute a parameterized directory search above
-// to inspect the C# before/after remediation diff and SQLite parameter bindings.</code></pre>
+                        <pre><code id="telemetryCode">// Awaiting form submission...</code></pre>
                     </div>
                 </div>
             </div>
@@ -314,12 +317,16 @@
 
             document.getElementById('probeVectorSelect').value = vectorCategory;
             document.getElementById('probePayloadInput').value = payload;
-            executeCurrentProbe();
+            SafeVault.showToast('Loaded probe preset into form. Click Execute Probe to inspect remediation.', 'success');
         }
 
         async function executeCurrentProbe() {
             const vector = document.getElementById('probeVectorSelect').value;
-            const payload = document.getElementById('probePayloadInput').value;
+            const payload = document.getElementById('probePayloadInput').value.trim();
+            if (!payload) {
+                SafeVault.showToast('Please enter or select a payload before executing the probe.', 'warning');
+                return;
+            }
             const res = await SafeVault.runRemediationProbe(vector, payload);
 
             const provBadge = document.getElementById('probeProvenanceBadge');
@@ -346,12 +353,21 @@
             }
         }
 
+        function loadSearchPreset(presetTerm) {
+            document.getElementById('directorySearchInput').value = presetTerm;
+            SafeVault.showToast('Loaded search preset into form. Click Search to execute.', 'success');
+        }
+
         async function runDirectorySearch(presetTerm) {
             const inputEl = document.getElementById('directorySearchInput');
             if (typeof presetTerm === 'string') {
                 inputEl.value = presetTerm;
             }
-            const term = inputEl.value;
+            const term = inputEl.value.trim();
+            if (!term) {
+                SafeVault.showToast('Please enter or select a search term before submitting.', 'warning');
+                return;
+            }
             const res = await SafeVault.searchUsersParameterized(term);
 
             document.getElementById('searchRawReadout').textContent = term || '(empty)';
@@ -412,8 +428,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderLedgerTable();
-            executeCurrentProbe();
-            runDirectorySearch('alice');
         });
     </script>
 </body>

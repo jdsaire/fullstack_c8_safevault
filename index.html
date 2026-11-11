@@ -36,18 +36,6 @@
     <!-- Main Content Hub -->
     <main class="main-content" id="mainContent" role="main">
 
-        <!-- Scope & Boundary Callout -->
-        <div class="scope-callout" role="region" aria-label="Activity Scope Notice">
-            <span style="font-size: 20px;" aria-hidden="true">🛡️</span>
-            <div>
-                <strong>Activities 1, 2 &amp; 3 Complete Capstone Scope:</strong> SafeVault enforces <em>Input Validation, Dual-Stage XSS Sanitization, Parameterized SQLite Queries (Activity 1)</em>, <em>Salted BCrypt Password Hashing, Constant-Time Login Verification, HMAC-SHA256 Session Tokens, and Role-Based Access Control (Activity 2)</em>, and <em>Codebase Vulnerability Remediation, Wildcard-Safe Parameterized Search, HTTP Security Headers, and the 28-Test NUnit Regression Suite (Activity 3)</em>.
-                <br>
-                <span style="color: var(--text-muted); font-size: 13.5px;">
-                    Provenance Discipline: Activity 3 distinguishes <strong>4 Identified Codebase Findings (<code>[M]</code>)</strong> from <strong>2 Simulated Exercise Baselines (<code>[SIM]</code>)</strong>.
-                </span>
-            </div>
-        </div>
-
         <!-- Hero Header -->
         <header class="page-hero">
             <div class="hero-tag">
@@ -55,14 +43,14 @@
             </div>
             <h1 class="hero-title">Defensive Security, Authentication, RBAC &amp; Remediation Hub</h1>
             <p class="hero-subtitle">
-                Explore SafeVault's cumulative defense-in-depth security layers across 7 dedicated full-page execution environments: input sanitization, SQL injection parameterization, XSS neutralization, salted BCrypt authentication, Role-Based Access Control (RBAC), vulnerability debugging &amp; parameterized search, and the 28-test NUnit verification suite.
+                Explore SafeVault's cumulative defense-in-depth security layers across 7 dedicated full-page execution environments: input sanitization, SQL injection parameterization, XSS neutralization, automated 28-test NUnit verification, salted BCrypt authentication, Role-Based Access Control (RBAC), and vulnerability debugging &amp; parameterized search.
             </p>
         </header>
 
-        <!-- 7 Guided Mission Cards (Multipage Navigation) -->
+        <!-- 7 Guided Mission Cards (Ordered 1 through 7) -->
         <section aria-labelledby="missionsHeading">
             <h2 id="missionsHeading" style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">
-                Guided Execution Cycles (Activities 1, 2 &amp; 3)
+                Guided Execution Cycles (1–7)
             </h2>
             <div class="mission-grid">
                 
@@ -75,7 +63,7 @@
                             Submit legitimate user credentials through the hardened client/server intake pipeline. Inspect real-time constraint validation, parameterized SQLite insertion, and relational storage.
                         </p>
                     </div>
-                    <a href="cycle1-intake.html" class="btn btn-outline btn-block">
+                    <a href="cycle1-intake.html" class="btn btn-primary btn-block">
                         Open Cycle 1: Intake ➔
                     </a>
                 </article>
@@ -89,7 +77,7 @@
                             Simulate tautologies (<code>' OR '1'='1</code>), stacked table drops, and inline comment attacks. Inspect how <code>SqliteParameter</code> binds inputs strictly as literal values.
                         </p>
                     </div>
-                    <a href="cycle2-sqli.html" class="btn btn-outline btn-block">
+                    <a href="cycle2-sqli.html" class="btn btn-primary btn-block">
                         Open Cycle 2: SQLi ➔
                     </a>
                 </article>
@@ -103,55 +91,13 @@
                             Inject malicious script execution tags, <code>onerror</code> event handlers, and pseudo-protocols. Observe how dual-stage client stripping and server entity encoding neutralize execution.
                         </p>
                     </div>
-                    <a href="cycle3-xss.html" class="btn btn-outline btn-block">
+                    <a href="cycle3-xss.html" class="btn btn-primary btn-block">
                         Open Cycle 3: XSS ➔
                     </a>
                 </article>
 
-                <!-- Mission Card 5 (Activity 2 Auth) -->
-                <article class="mission-card" style="border-color: rgba(192, 132, 252, 0.45);">
-                    <div>
-                        <span class="mission-badge violet">Cycle 5 · Activity 2 Auth</span>
-                        <h3 class="mission-heading">BCrypt Password Hashing &amp; Login</h3>
-                        <p class="mission-desc">
-                            Dissect 60-character <code>$2a$12$</code> BCrypt hashes (cost factor 12, unique 128-bit salts). Simulate valid logins, wrong passwords (<code>401</code>), constant-time anti-enumeration, and SQLi login probes.
-                        </p>
-                    </div>
-                    <a href="cycle5-auth.html" class="btn btn-outline btn-block">
-                        Open Cycle 5: Auth ➔
-                    </a>
-                </article>
-
-                <!-- Mission Card 6 (Activity 2 RBAC) -->
-                <article class="mission-card" style="border-color: rgba(34, 211, 238, 0.45);">
-                    <div>
-                        <span class="mission-badge cyan">Cycle 6 · Activity 2 RBAC</span>
-                        <h3 class="mission-heading">RBAC &amp; Protected Admin Dashboard</h3>
-                        <p class="mission-desc">
-                            Switch roles (<code>Admin</code>, <code>Auditor</code>, <code>User</code>, <code>Guest</code>, or tampered token) to test route gates on <code>/api/admin/dashboard</code> and <code>/api/audit/logs</code> (<code>200 OK</code> vs <code>403</code>/<code>401</code>).
-                        </p>
-                    </div>
-                    <a href="cycle6-rbac.html" class="btn btn-outline btn-block">
-                        Open Cycle 6: RBAC ➔
-                    </a>
-                </article>
-
-                <!-- Mission Card 7 (Activity 3 Remediation Audit) -->
-                <article class="mission-card" style="border-color: rgba(52, 211, 153, 0.55);">
-                    <div>
-                        <span class="mission-badge emerald">Cycle 7 · Activity 3 Remediation</span>
-                        <h3 class="mission-heading">Vulnerability Debugging &amp; Search Audit</h3>
-                        <p class="mission-desc">
-                            Inspect before/after diffs for 4 codebase findings (<code>V1</code>–<code>V4 [M]</code>) and 2 simulated baselines (<code>S1</code>–<code>S2 [SIM]</code>), plus live wildcard-safe parameterized search (<code>LIKE @SearchPattern ESCAPE '\'</code>).
-                        </p>
-                    </div>
-                    <a href="cycle7-debug.html" class="btn btn-primary btn-block">
-                        Open Cycle 7: Debug Audit ➔
-                    </a>
-                </article>
-
-                <!-- Mission Card 4 (Unified 28-Test Suite) -->
-                <article class="mission-card" style="border-color: rgba(56, 189, 248, 0.55);">
+                <!-- Mission Card 4 -->
+                <article class="mission-card">
                     <div>
                         <span class="mission-badge blue">Cycle 4 · Unified Verification</span>
                         <h3 class="mission-heading">28-Test Automated NUnit Suite</h3>
@@ -164,11 +110,53 @@
                     </a>
                 </article>
 
+                <!-- Mission Card 5 -->
+                <article class="mission-card">
+                    <div>
+                        <span class="mission-badge violet">Cycle 5 · Activity 2 Auth</span>
+                        <h3 class="mission-heading">BCrypt Password Hashing &amp; Login</h3>
+                        <p class="mission-desc">
+                            Dissect 60-character <code>$2a$12$</code> BCrypt hashes (cost factor 12, unique 128-bit salts). Simulate valid logins, wrong passwords (<code>401</code>), constant-time anti-enumeration, and SQLi login probes.
+                        </p>
+                    </div>
+                    <a href="cycle5-auth.html" class="btn btn-primary btn-block">
+                        Open Cycle 5: Auth ➔
+                    </a>
+                </article>
+
+                <!-- Mission Card 6 -->
+                <article class="mission-card">
+                    <div>
+                        <span class="mission-badge cyan">Cycle 6 · Activity 2 RBAC</span>
+                        <h3 class="mission-heading">RBAC &amp; Protected Admin Dashboard</h3>
+                        <p class="mission-desc">
+                            Switch roles (<code>Admin</code>, <code>Auditor</code>, <code>User</code>, <code>Guest</code>, or tampered token) to test route gates on <code>/api/admin/dashboard</code> and <code>/api/audit/logs</code> (<code>200 OK</code> vs <code>403</code>/<code>401</code>).
+                        </p>
+                    </div>
+                    <a href="cycle6-rbac.html" class="btn btn-primary btn-block">
+                        Open Cycle 6: RBAC ➔
+                    </a>
+                </article>
+
+                <!-- Mission Card 7 -->
+                <article class="mission-card">
+                    <div>
+                        <span class="mission-badge emerald">Cycle 7 · Activity 3 Remediation</span>
+                        <h3 class="mission-heading">Vulnerability Debugging &amp; Search Audit</h3>
+                        <p class="mission-desc">
+                            Inspect before/after diffs for 4 codebase findings (<code>V1</code>–<code>V4 [M]</code>) and 2 simulated baselines (<code>S1</code>–<code>S2 [SIM]</code>), plus live wildcard-safe parameterized search (<code>LIKE @SearchPattern ESCAPE '\'</code>).
+                        </p>
+                    </div>
+                    <a href="cycle7-debug.html" class="btn btn-primary btn-block">
+                        Open Cycle 7: Debug Audit ➔
+                    </a>
+                </article>
+
             </div>
         </section>
 
         <!-- System Architecture & Verification Summary -->
-        <section aria-labelledby="archHeading" style="margin-bottom: 36px;">
+        <section aria-labelledby="archHeading" style="margin-bottom: 28px;">
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title" id="archHeading">
@@ -217,35 +205,17 @@
             </div>
         </section>
 
-        <!-- Quarantined Collapsible Telemetry & Code Generation Panel -->
-        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
-            <div class="telemetry-card">
-                <div class="telemetry-header">
-                    <div class="telemetry-title">
-                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
-                        <h3 id="telemetryHeading">Session Telemetry &amp; Code Generation Inspector</h3>
-                        <span class="telemetry-status" id="telemetryStatus">Active</span>
-                    </div>
-                    <div class="telemetry-actions">
-                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
-                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
-                    </div>
-                </div>
-                <div class="telemetry-body" id="telemetryBody">
-                    <div class="telemetry-meta">
-                        <span>Status: <strong id="telemetryTarget">Mission Hub Ready (Activities 1–3 Complete)</strong></span>
-                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
-                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
-                    </div>
-                    <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// SafeVault Activities 1, 2 &amp; 3 Multipage Architecture Active.
-// Navigate to Cycle 7 (Vulnerability Debugging &amp; Search Audit) or Cycle 4 (28-Test NUnit Runner)
-// to inspect before/after remediation diffs, wildcard-safe SQLite search, and regression verification.</code></pre>
-                    </div>
-                </div>
+        <!-- Scope & Boundary Disclosure Callout (Positioned Before Footer) -->
+        <div class="scope-callout" role="region" aria-label="Activity Scope Notice" style="margin-bottom: 0;">
+            <span style="font-size: 20px;" aria-hidden="true">🛡️</span>
+            <div>
+                <strong>Activities 1, 2 &amp; 3 Complete Capstone Scope:</strong> SafeVault enforces <em>Input Validation, Dual-Stage XSS Sanitization, Parameterized SQLite Queries (Activity 1)</em>, <em>Salted BCrypt Password Hashing, Constant-Time Login Verification, HMAC-SHA256 Session Tokens, and Role-Based Access Control (Activity 2)</em>, and <em>Codebase Vulnerability Remediation, Wildcard-Safe Parameterized Search, HTTP Security Headers, and the 28-Test NUnit Regression Suite (Activity 3)</em>.
+                <br>
+                <span style="color: var(--text-muted); font-size: 13.5px;">
+                    Provenance Discipline: Activity 3 distinguishes <strong>4 Identified Codebase Findings (<code>[M]</code>)</strong> from <strong>2 Simulated Exercise Baselines (<code>[SIM]</code>)</strong>.
+                </span>
             </div>
-        </section>
+        </div>
 
     </main>
 
@@ -256,7 +226,7 @@
                 SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
             </div>
             <div>
-                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Multipage Architecture
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Multipage Security Architecture
             </div>
         </div>
     </footer>
