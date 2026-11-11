@@ -24,13 +24,24 @@ SafeVault demonstrates defense-in-depth secure coding principles, focusing on th
   - `TestForSQLInjection()`: Simulates SQL injection attempts (tautologies, stacked queries, inline comments, union attacks) against the data access layer, verifying that parameters are strictly treated as data and table integrity remains uncompromised.
   - `TestForXSS()`: Simulates script injection and malicious event handler attributes, verifying that the sanitization engine reliably neutralizes executable code.
 
-### 4. WCAG 2.1 Accessibility & Interactive Task Guidance
-- **WCAG 2.1 Compliant Interface**: Redesigned UI featuring comfortable typography (>= 16px body/inputs, >= 14.5px code), generous line-heights, 44px+ touch targets, and high contrast ratios (>= 12:1) meeting WCAG 2.1 AAA standards.
-- **Guided Task Missions**: Dedicated onboarding panel providing visitors with 4 step-by-step interactive verification cycles:
-  1. *Cycle 1 — Legitimate Registration*: Verify valid input constraints and parameter binding.
-  2. *Cycle 2 — SQL Injection Neutralization*: Execute tautologies and stacked drops to observe parameterized query protection.
-  3. *Cycle 3 — XSS Defense*: Submit executable payloads to observe client/server HTML entity sanitization.
-  4. *Cycle 4 — Automated Test Verification*: Run the full 8-point security suite directly in-browser or via the .NET CLI.
+### 4. Multipage Architecture & Quarantined Telemetry Inspector
+- **Multipage Navigation**: Modularized into dedicated, focused verification environments:
+  - **Hub (`index.html`)**: Executive mission overview, security boundary disclosure, and navigation links.
+  - **Cycle 1 (`cycle1-intake.html`)**: Valid user registration, regex validation badges, and live relational store view.
+  - **Cycle 2 (`cycle2-sqli.html`)**: SQL injection attack simulation (tautologies, stacked drops, comments) and parameter inspection.
+  - **Cycle 3 (`cycle3-xss.html`)**: Cross-Site Scripting defense with dual-stage sanitization (tag stripping and entity encoding).
+  - **Cycle 4 (`cycle4-tests.html`)**: Automated NUnit test suite runner executing all 8 security assertions live in-browser.
+  - **Standalone Form (`webform.html`)**: Direct access to the hardened intake form.
+- **Quarantined Telemetry Panels**: Each cycle incorporates a collapsible, accessible telemetry inspector (with Show/Hide, Copy Code, and Reset controls) to inspect generated parameterized SQL, entity transforms, or test execution traces without polluting the DOM.
+- **WCAG 2.1 AAA Accessibility**: 16px base font, 18px card headers, 14.5px code, high contrast ratios (>= 12:1), and 44px+ touch targets.
+
+---
+
+## Scope Boundaries: Activity 1 vs Activity 2
+
+SafeVault is developed iteratively across the specialization:
+- **Activity 1 Scope (Current)**: Defensive Input Validation, Sanitization, Parameterized SQLite Queries (SQLi prevention), and Automated NUnit Vulnerability Tests.
+- **Activity 2 Scope (Subsequent)**: User Authentication, Secure Password Hashing (via Argon2/bcrypt), Login Tokens/Sessions, and Role-Based Access Control (RBAC). No authentication or RBAC logic is prematurely introduced into Activity 1.
 
 ---
 
@@ -38,11 +49,20 @@ SafeVault demonstrates defense-in-depth secure coding principles, focusing on th
 
 ```
 ├── .gitignore
+├── .nojekyll
 ├── README.md
 ├── SafeVault.sln
 ├── database.sql
 ├── index.html
+├── cycle1-intake.html
+├── cycle2-sqli.html
+├── cycle3-xss.html
+├── cycle4-tests.html
 ├── webform.html
+├── css/
+│   └── styles.css
+├── js/
+│   └── safevault.js
 ├── src/
 │   └── SafeVault/
 │       ├── Data/
