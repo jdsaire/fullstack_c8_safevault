@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeVault · Cycle 6: Role-Based Access Control (RBAC)</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activities 1–2 Protected</span>
+            </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+                <a href="cycle5-auth.html" class="nav-link">Cycle 5: Auth</a>
+                <a href="cycle6-rbac.html" class="nav-link active" aria-current="page">Cycle 6: RBAC</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">🏛️</span> Cycle 6 · Activity 2 Role-Based Access Control (RBAC)
+            </div>
+            <h1 class="hero-title">RBAC Policy Enforcement & Protected Admin Dashboard</h1>
+            <p class="hero-subtitle">
+                Switch between user roles (<code>Admin</code>, <code>Auditor</code>, <code>User</code>, and <code>Unauthenticated Guest</code>) to test route-level access gates and inspect how <code>AuthorizationService</code> protects the Admin Dashboard against unauthorized access.
+            </p>
+        </header>
+
+        <!-- Two-Column Workspace -->
+        <div class="workspace-grid">
+
+            <!-- Left Card: Active Session Identity & Route Probe Controller -->
+            <section class="card" aria-labelledby="sessionCardTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="sessionCardTitle">
+                        <span aria-hidden="true">🪪</span> Active Principal & Route Gate Controller
+                    </h2>
+                    <span id="activeRoleBadge"><span class="role-badge admin">Admin</span></span>
+                </div>
+
+                <!-- Step 1: Select Principal Identity -->
+                <div style="margin-bottom: 18px;">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                        1. Select Session Identity (Simulates Logged-In Role):
+                    </span>
+                    <div class="preset-group" id="identityButtons">
+                        <button type="button" class="preset-pill active" id="id-admin" onclick="selectPrincipal('admin')">admin_vault (Admin)</button>
+                        <button type="button" class="preset-pill" id="id-auditor" onclick="selectPrincipal('auditor')">carol_audit (Auditor)</button>
+                        <button type="button" class="preset-pill" id="id-user" onclick="selectPrincipal('user')">alice_vault (User)</button>
+                        <button type="button" class="preset-pill" id="id-tampered" onclick="selectPrincipal('tampered')">Tampered Token (Escalation Attempt)</button>
+                        <button type="button" class="preset-pill" id="id-guest" onclick="selectPrincipal('guest')">Unauthenticated Guest (No Token)</button>
+                    </div>
+                </div>
+
+                <!-- Active Signed Token Inspector -->
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Authorization Bearer Token (HMAC-SHA256)</span>
+                        <span class="step-method" id="tokenValidityLabel">Valid Signature</span>
+                    </div>
+                    <div class="step-output" id="activeTokenDisplay" style="font-size: 13px; color: #38bdf8;"></div>
+                </div>
+
+                <!-- Step 2: Probe Protected Routes -->
+                <div style="margin-top: 18px;">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 10px;">
+                        2. Probe Protected SafeVault Endpoints:
+                    </span>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                        <button type="button" class="btn btn-primary btn-block" style="justify-content: space-between;" onclick="probeRoute('/api/admin/dashboard')">
+                            <span>GET /api/admin/dashboard</span>
+                            <span style="font-size: 12px; opacity: 0.85;">Requires: Admin</span>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-block" style="justify-content: space-between;" onclick="probeRoute('/api/audit/logs')">
+                            <span>GET /api/audit/logs</span>
+                            <span style="font-size: 12px; color: var(--color-warning);">Requires: Admin, Auditor</span>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-block" style="justify-content: space-between;" onclick="probeRoute('/api/vault/profile')">
+                            <span>GET /api/vault/profile</span>
+                            <span style="font-size: 12px; color: var(--color-primary);">Requires: Admin, Auditor, User</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Card: Protected Resource Viewport (Admin Dashboard / 403 / 401) -->
+            <section class="card" aria-labelledby="resourceViewportTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="resourceViewportTitle">
+                        <span aria-hidden="true">🖥️</span> Protected Resource Viewport
+                    </h2>
+                    <span class="http-badge http-200" id="rbacHttpBadge">200 OK · Access Granted</span>
+                </div>
+
+                <!-- Gate Decision Summary -->
+                <div class="pipeline-step" id="decisionBanner">
+                    <div class="step-header">
+                        <span class="step-name" id="decisionRouteLabel">Target: /api/admin/dashboard</span>
+                        <span class="step-method">AuthorizationService.cs</span>
+                    </div>
+                    <div class="step-output" id="decisionSummaryOutput"></div>
+                </div>
+
+                <!-- Dynamic Protected View Container -->
+                <div id="protectedResourceContainer" style="margin-top: 16px;">
+                    <!-- Rendered dynamically based on RBAC decision -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- RBAC Permission Matrix Reference -->
+        <section class="card" aria-labelledby="matrixHeading" style="margin-bottom: 32px;">
+            <div class="card-header">
+                <h2 class="card-title" id="matrixHeading">
+                    <span aria-hidden="true">📋</span> SafeVault Role-Based Access Control (RBAC) Policy Matrix
+                </h2>
+                <span class="brand-badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.35);">
+                    Least Privilege Enforced
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="db-table" aria-label="RBAC Route Policy Matrix">
+                    <thead>
+                        <tr>
+                            <th scope="col">Protected Route / Feature</th>
+                            <th scope="col"><span class="role-badge admin">Admin</span></th>
+                            <th scope="col"><span class="role-badge auditor">Auditor</span></th>
+                            <th scope="col"><span class="role-badge user">User</span></th>
+                            <th scope="col"><span class="role-badge guest">Guest / Tampered</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GET /api/admin/dashboard</code> (Admin Dashboard)</td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-403">403 Forbidden</span></td>
+                            <td><span class="http-badge http-403">403 Forbidden</span></td>
+                            <td><span class="http-badge http-401">401 Unauthorized</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>POST /api/admin/users/{user}/role</code> (Role Assignment)</td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-403">403 Forbidden</span></td>
+                            <td><span class="http-badge http-403">403 Forbidden</span></td>
+                            <td><span class="http-badge http-401">401 Unauthorized</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>GET /api/audit/logs</code> (Security Audit Stream)</td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-403">403 Forbidden</span></td>
+                            <td><span class="http-badge http-401">401 Unauthorized</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>GET /api/vault/profile</code> (Personal Vault)</td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-200">200 OK (Granted)</span></td>
+                            <td><span class="http-badge http-401">401 Unauthorized</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 6 Telemetry & RBAC Policy Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                    </div>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
+                </div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Target: <strong id="telemetryTarget">Cycle 6 RBAC Gate</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
+                    </div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// Select any session identity and probe a protected route above to inspect
+// the exact C# AuthorizationService token and role evaluation trace.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 6: RBAC & Admin Dashboard
+            </div>
+        </div>
+    </footer>
+
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
+    <script>
+        let currentPrincipalKey = 'admin';
+        let currentRoute = '/api/admin/dashboard';
+        let activeBearerToken = null;
+
+        function buildTokenForPrincipal(key) {
+            if (key === 'admin') {
+                return SafeVault.issueSignedToken(1, 'admin_vault', 'Admin');
+            }
+            if (key === 'auditor') {
+                return SafeVault.issueSignedToken(2, 'carol_audit', 'Auditor');
+            }
+            if (key === 'user') {
+                return SafeVault.issueSignedToken(3, 'alice_vault', 'User');
+            }
+            if (key === 'tampered') {
+                const validUserToken = SafeVault.issueSignedToken(3, 'alice_vault', 'User');
+                const sig = validUserToken.split('.')[1];
+                const forgedPayload = btoa('3|alice_vault|Admin|9999999999').replace(/=+$/, '');
+                return forgedPayload + '.' + sig;
+            }
+            return null; // guest
+        }
+
+        function selectPrincipal(key) {
+            currentPrincipalKey = key;
+            document.querySelectorAll('#identityButtons .preset-pill').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('id-' + key);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            activeBearerToken = buildTokenForPrincipal(key);
+            const roleBadgeContainer = document.getElementById('activeRoleBadge');
+            const tokenDisplay = document.getElementById('activeTokenDisplay');
+            const validityLabel = document.getElementById('tokenValidityLabel');
+
+            if (key === 'admin') {
+                roleBadgeContainer.innerHTML = '<span class="role-badge admin">Admin · admin_vault</span>';
+                tokenDisplay.textContent = 'Bearer ' + activeBearerToken;
+                validityLabel.textContent = 'HMAC-SHA256 Valid';
+            } else if (key === 'auditor') {
+                roleBadgeContainer.innerHTML = '<span class="role-badge auditor">Auditor · carol_audit</span>';
+                tokenDisplay.textContent = 'Bearer ' + activeBearerToken;
+                validityLabel.textContent = 'HMAC-SHA256 Valid';
+            } else if (key === 'user') {
+                roleBadgeContainer.innerHTML = '<span class="role-badge user">User · alice_vault</span>';
+                tokenDisplay.textContent = 'Bearer ' + activeBearerToken;
+                validityLabel.textContent = 'HMAC-SHA256 Valid';
+            } else if (key === 'tampered') {
+                roleBadgeContainer.innerHTML = '<span class="role-badge guest">Tampered Payload (User -> Admin)</span>';
+                tokenDisplay.textContent = 'Bearer ' + activeBearerToken;
+                validityLabel.textContent = 'Signature Mismatch!';
+            } else {
+                roleBadgeContainer.innerHTML = '<span class="role-badge guest">Unauthenticated Guest</span>';
+                tokenDisplay.textContent = '// No Authorization header present';
+                validityLabel.textContent = 'Missing Token';
+            }
+
+            probeRoute(currentRoute);
+        }
+
+        function probeRoute(routePath) {
+            currentRoute = routePath;
+            const decision = SafeVault.evaluateRbacRoute(activeBearerToken, routePath);
+            const httpBadge = document.getElementById('rbacHttpBadge');
+            const routeLabel = document.getElementById('decisionRouteLabel');
+            const summaryOut = document.getElementById('decisionSummaryOutput');
+            const container = document.getElementById('protectedResourceContainer');
+
+            routeLabel.textContent = 'Target: ' + routePath + ' (Allowed: ' + decision.requiredRoles.join(', ') + ')';
+            summaryOut.textContent =
+                'Principal: ' + (decision.username || 'Anonymous / Invalid Token') + '\n' +
+                'Evaluated Role: ' + (decision.actualRole || 'None') + '\n' +
+                'Policy Verdict: ' + decision.message;
+
+            if (decision.statusCode === 200) {
+                httpBadge.textContent = '200 OK · Access Granted';
+                httpBadge.className = 'http-badge http-200';
+                renderUnlockedResource(container, routePath, decision);
+                SafeVault.showToast(decision.message, 'success');
+            } else if (decision.statusCode === 403) {
+                httpBadge.textContent = '403 Forbidden';
+                httpBadge.className = 'http-badge http-403';
+                renderDeniedResource(container, decision, '403 Forbidden · Insufficient Role Privileges');
+                SafeVault.showToast(decision.message, 'error');
+            } else {
+                httpBadge.textContent = '401 Unauthorized';
+                httpBadge.className = 'http-badge http-401';
+                renderDeniedResource(container, decision, '401 Unauthorized · Authentication Required');
+                SafeVault.showToast(decision.message, 'warning');
+            }
+        }
+
+        function renderUnlockedResource(container, routePath, decision) {
+            if (routePath === '/api/admin/dashboard') {
+                const users = SafeVault.getDatabase();
+                container.innerHTML = `
+                    <div style="background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.35); border-radius: var(--radius-md); padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                            <h3 style="font-size: 16.5px; color: #6ee7b7; font-weight: 700;">
+                                🔓 Admin Security Dashboard Unlocked (Role: Admin)
+                            </h3>
+                            <span class="role-badge admin">Admin Controls Active</span>
+                        </div>
+                        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">
+                            Modify user RBAC roles below via <code>POST /api/admin/users/{username}/role</code>:
+                        </p>
+                        <div style="display: grid; gap: 10px;">
+                            ${users.map(u => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: #080d18; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;">
+                                    <div>
+                                        <strong style="color: #ffffff;">${SafeVault.escapeHtml(u.username)}</strong>
+                                        <span style="color: var(--text-muted); font-size: 13px; margin-left: 6px;">(${SafeVault.escapeHtml(u.email)})</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        ${SafeVault.renderRoleBadge(u.role)}
+                                        <select aria-label="Change role for ${SafeVault.escapeHtml(u.username)}" onchange="handleRoleChange('${SafeVault.escapeHtml(u.username)}', this.value)" style="background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size: 13px; min-height: 36px;">
+                                            <option value="Admin" ${u.role === 'Admin' ? 'selected' : ''}>Set Admin</option>
+                                            <option value="Auditor" ${u.role === 'Auditor' ? 'selected' : ''}>Set Auditor</option>
+                                            <option value="User" ${u.role === 'User' ? 'selected' : ''}>Set User</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (routePath === '/api/audit/logs') {
+                container.innerHTML = `
+                    <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: var(--radius-md); padding: 16px;">
+                        <h3 style="font-size: 16.5px; color: #fde68a; font-weight: 700; margin-bottom: 10px;">
+                            🔓 Compliance & Security Audit Stream Unlocked (${SafeVault.escapeHtml(decision.actualRole)})
+                        </h3>
+                        <ul style="list-style: none; font-family: var(--font-mono); font-size: 13.5px; color: var(--text-secondary); display: grid; gap: 8px;">
+                            <li style="background: #080d18; padding: 8px 12px; border-radius: 4px;">[AUD-101] BCrypt workFactor=12 salted hashing active on Users store</li>
+                            <li style="background: #080d18; padding: 8px 12px; border-radius: 4px;">[AUD-102] RBAC route gate active on /api/admin/dashboard (Admin only)</li>
+                            <li style="background: #080d18; padding: 8px 12px; border-radius: 4px;">[AUD-103] Parameterized SqliteParameter bindings verified across all queries</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: var(--radius-md); padding: 16px;">
+                        <h3 style="font-size: 16.5px; color: #bae6fd; font-weight: 700; margin-bottom: 8px;">
+                            🔓 Authenticated Personal Vault Profile (${SafeVault.escapeHtml(decision.username)})
+                        </h3>
+                        <p style="font-size: 14.5px; color: var(--text-secondary);">
+                            Signed session token verified for principal <code>${SafeVault.escapeHtml(decision.username)}</code> with role <code>${SafeVault.escapeHtml(decision.actualRole)}</code>. Standard personal vault records accessible.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderDeniedResource(container, decision, heading) {
+            const is403 = decision.statusCode === 403;
+            const borderCol = is403 ? 'rgba(248, 113, 113, 0.45)' : 'rgba(251, 191, 36, 0.45)';
+            const bgCol = is403 ? 'rgba(248, 113, 113, 0.08)' : 'rgba(251, 191, 36, 0.08)';
+            const titleCol = is403 ? '#fca5a5' : '#fde68a';
+
+            container.innerHTML = `
+                <div style="background: ${bgCol}; border: 1px solid ${borderCol}; border-radius: var(--radius-md); padding: 18px;">
+                    <h3 style="font-size: 17px; color: ${titleCol}; font-weight: 700; margin-bottom: 8px;">
+                        🔒 ${SafeVault.escapeHtml(heading)}
+                    </h3>
+                    <p style="font-size: 14.5px; color: var(--text-secondary); margin-bottom: 12px;">
+                        ${SafeVault.escapeHtml(decision.message)}
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); background: #060911; padding: 10px 12px; border-radius: 4px;">
+                         Guard: AuthorizationService.AuthorizeByToken() · Route: ${SafeVault.escapeHtml(decision.route)} · Required: [${SafeVault.escapeHtml(decision.requiredRoles.join(', '))}]
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleRoleChange(targetUser, newRole) {
+            const res = SafeVault.updateAccountRole(activeBearerToken, targetUser, newRole);
+            if (res.isAuthorized) {
+                SafeVault.showToast(res.message, 'success');
+                probeRoute('/api/admin/dashboard');
+            } else {
+                SafeVault.showToast(res.message, 'error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            selectPrincipal('admin');
+        });
+    </script>
+</body>
+</html>
