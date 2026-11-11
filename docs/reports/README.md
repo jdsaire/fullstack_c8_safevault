@@ -33,5 +33,5 @@ Each Activity Completion Report follows a consistent nine-section structure:
 | Activity ID | Title | Code Status | Pull Requests | Author | Date | Report Link |
 |---|---|---|---|---|---|---|
 | **C8-ACT1** | Input Validation, Parameterized Queries & Multipage Architecture | Completed on `main` (`eb99ab5`) | [#1](https://github.com/jdsaire/fullstack_c8_safevault/pull/1), [#2](https://github.com/jdsaire/fullstack_c8_safevault/pull/2), [#3](https://github.com/jdsaire/fullstack_c8_safevault/pull/3) | Juan Diego S. | Nov 2026 | [ACTIVITY-1-COMPLETION-REPORT.md](ACTIVITY-1-COMPLETION-REPORT.md) |
-| **C8-ACT2** | Authentication & Role-Based Access Control (RBAC) | Completed on `main` (`feedc6a`) | [#4](https://github.com/jdsaire/fullstack_c8_safevault/pull/4) | Juan Diego S. | Nov 2026 | [ACTIVITY-2-COMPLETION-REPORT.md](ACTIVITY-2-COMPLETION-REPORT.md) |
-| **C8-ACT3** | Security Debugging, Vulnerability Remediation & Capstone Summary | Code completed on `main` (`52227f2`) | [#5](https://github.com/jdsaire/fullstack_c8_safevault/pull/5) | Juan Diego S. | Nov 2026 | *Report pending next run* |
+| **C8-ACT3** | Security Debugging, Vulnerability Remediation & Capstone Summary | Completed on `main` (`c670798`) | [#5](https://github.com/jdsaire/fullstack_c8_safevault/pull/5), [#6](https://github.com/jdsaire/fullstack_c8_safevault/pull/6), [#7](https://github.com/jdsaire/fullstack_c8_safevault/pull/7) | Juan Diego S. | Nov 2026 | [ACTIVITY-3-COMPLETION-REPORT.md](ACTIVITY-3-COMPLETION-REPORT.md) |
+
