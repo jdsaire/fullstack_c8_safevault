@@ -32,5 +32,5 @@ Each Activity Completion Report adheres to the following structural schema:
 | Activity ID | Title | Status | Pull Requests | Author | Date | Report Link |
 |---|---|---|---|---|---|---|
 | **C8-ACT1** | Input Validation, Parameterized Queries & Multipage Architecture | **COMPLETE** | PR #1, PR #2, PR #3 | Juan Diego S. | Nov 2026 | [ACTIVITY-1-COMPLETION-REPORT.md](ACTIVITY-1-COMPLETION-REPORT.md) |
-| **C8-ACT2** | Authentication & Role-Based Access Control (RBAC) | *Pending* | — | Juan Diego S. | *Upcoming* | *Scheduled for next run* |
+| **C8-ACT2** | Authentication & Role-Based Access Control (RBAC) | **COMPLETE** | PR #4 | Juan Diego S. | Nov 2026 | [ACTIVITY-2-COMPLETION-REPORT.md](ACTIVITY-2-COMPLETION-REPORT.md) |
 | **C8-ACT3** | Security Debugging & Capstone Evaluation Summary | *Pending* | — | Juan Diego S. | *Upcoming* | *Scheduled for final run* |

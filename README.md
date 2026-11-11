@@ -101,6 +101,7 @@ SafeVault is developed iteratively across the Course 8 capstone activities:
 ├── docs/
 │   └── reports/
 │       ├── ACTIVITY-1-COMPLETION-REPORT.md
+│       ├── ACTIVITY-2-COMPLETION-REPORT.md
 │       └── README.md
 ├── src/
 │   └── SafeVault/
