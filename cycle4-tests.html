@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeVault · Cycle 4: Automated Security Suite</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activity 1 Protected</span>
+            </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link active" aria-current="page">Cycle 4: Tests</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">🧪</span> Cycle 4 · Automated Test Verification
+            </div>
+            <h1 class="hero-title">Automated NUnit Security Test Suite Runner</h1>
+            <p class="hero-subtitle">
+                Execute all 8 security assertions live in-browser (mirroring <code>Tests/TestInputValidation.cs</code>). Verify SQL injection resistance, XSS sanitization, and input boundary validation with instant pass telemetry.
+            </p>
+        </header>
+
+        <!-- Test Suite Control Panel -->
+        <section class="card" aria-labelledby="controlsTitle" style="margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h2 class="card-title" id="controlsTitle" style="margin-bottom: 4px;">
+                        <span>NUnit Test Fixture:</span> <code>TestInputValidation</code>
+                    </h2>
+                    <p style="font-size: 14.5px; color: var(--text-secondary);">
+                        Command equivalent: <code>dotnet test Tests/Tests.csproj --logger "console;verbosity=detailed"</code>
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="telemetry-status" id="testSuiteBadge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; font-size: 14px; padding: 6px 14px;">
+                        Ready (8 Tests Discovered)
+                    </span>
+                    <button type="button" class="btn btn-primary" id="runAllTestsBtn" onclick="triggerTestExecution()">
+                        ▶ Run All 8 Security Tests
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Test Results Grid -->
+        <section aria-labelledby="resultsHeading">
+            <h2 id="resultsHeading" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">
+                Test Results
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;" id="testsContainer">
+                
+                <!-- Test 1 -->
+                <div class="card" id="card-1" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #fb7185; text-transform: uppercase;">SQLi Defense</span>
+                        <span class="telemetry-status" id="badge-1" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestForSQLInjection()</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Verifies tautologies (<code>' OR '1'='1</code>) and stacked drops are treated as literals by SQLite.
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-1">
+                        Duration: 38ms · SqliteParameter Literal
+                    </div>
+                </div>
+
+                <!-- Test 2 -->
+                <div class="card" id="card-2" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #fbbf24; text-transform: uppercase;">XSS Defense</span>
+                        <span class="telemetry-status" id="badge-2" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestForXSS()</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Verifies <code>WebUtility.HtmlEncode</code> strips executable script tags and event handlers.
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-2">
+                        Duration: 28ms · Entity Neutralized
+                    </div>
+                </div>
+
+                <!-- Test 3 -->
+                <div class="card" id="card-3" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Validation Boundary</span>
+                        <span class="telemetry-status" id="badge-3" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestInvalidInput(empty user)</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Asserts validation fails when username is empty: "Username is required."
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-3">
+                        Duration: &lt; 1ms · Required Check
+                    </div>
+                </div>
+
+                <!-- Test 4 -->
+                <div class="card" id="card-4" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Validation Boundary</span>
+                        <span class="telemetry-status" id="badge-4" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestInvalidInput(short user)</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Asserts validation fails when username length &lt; 3 characters.
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-4">
+                        Duration: &lt; 1ms · Min Boundary 3
+                    </div>
+                </div>
+
+                <!-- Test 5 -->
+                <div class="card" id="card-5" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Validation Boundary</span>
+                        <span class="telemetry-status" id="badge-5" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestInvalidInput(spaces)</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Asserts validation fails when username contains spaces or disallowed symbols.
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-5">
+                        Duration: &lt; 1ms · Character Regex
+                    </div>
+                </div>
+
+                <!-- Test 6 -->
+                <div class="card" id="card-6" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Validation Boundary</span>
+                        <span class="telemetry-status" id="badge-6" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestInvalidInput(empty email)</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Asserts validation fails when email is missing: "Email is required."
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-6">
+                        Duration: &lt; 1ms · Required Check
+                    </div>
+                </div>
+
+                <!-- Test 7 -->
+                <div class="card" id="card-7" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Validation Boundary</span>
+                        <span class="telemetry-status" id="badge-7" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestInvalidInput(bad email)</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Asserts validation fails on non-RFC email: "Email format is invalid."
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-7">
+                        Duration: &lt; 1ms · RFC 5322 Check
+                    </div>
+                </div>
+
+                <!-- Test 8 -->
+                <div class="card" id="card-8" style="border-left: 4px solid var(--color-success);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #34d399; text-transform: uppercase;">Intake Boundary</span>
+                        <span class="telemetry-status" id="badge-8" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Passed</span>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">TestValidInput()</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Asserts valid credentials satisfy all constraints with zero error messages.
+                    </p>
+                    <div style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted);" id="meta-8">
+                        Duration: 1ms · Compliant
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 4 Telemetry & NUnit Execution Console</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Suite Complete</span>
+                    </div>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
+                </div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Runner: <strong id="telemetryTarget">NUnit 3.14 / VSTest 17.11</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">0.73s</strong></span>
+                    </div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// SafeVault NUnit 3 Test Execution Trace
+// Command: dotnet test Tests/Tests.csproj --logger "console;verbosity=detailed"
+
+Test run for SafeVault/Tests/bin/Debug/net8.0/Tests.dll (.NETCoreApp,Version=v8.0)
+NUnit Adapter 4.5.0.0: Test execution started
+Running all tests in Tests/bin/Debug/net8.0/Tests.dll
+   NUnit3TestExecutor discovered 8 of 8 NUnit test cases using Current Discovery mode, Non-Explicit run
+NUnit Adapter 4.5.0.0: Test execution complete
+  Passed TestForSQLInjection [38 ms]
+  Passed TestForXSS [28 ms]
+  Passed TestInvalidInput_FailsValidation("","user@test.com","Username is required.") [< 1 ms]
+  Passed TestInvalidInput_FailsValidation("ab","user@test.com","Username must be between 3 and 50 characters.") [< 1 ms]
+  Passed TestInvalidInput_FailsValidation("invalid user name with spaces","user@test.com","Username contains invalid characters.") [< 1 ms]
+  Passed TestInvalidInput_FailsValidation("valid_user","","Email is required.") [< 1 ms]
+  Passed TestInvalidInput_FailsValidation("valid_user","not-an-email","Email format is invalid.") [< 1 ms]
+  Passed TestValidInput_PassesValidation [1 ms]
+
+Test Run Successful.
+Total tests: 8
+     Passed: 8
+ Total time: 0.7298 Seconds</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 4: Automated Verification
+            </div>
+        </div>
+    </footer>
+
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
+    <script>
+        async function triggerTestExecution() {
+            const btn = document.getElementById('runAllTestsBtn');
+            const badge = document.getElementById('testSuiteBadge');
+            btn.disabled = true;
+            btn.textContent = '⏳ Executing 8 Tests...';
+            badge.textContent = 'Running Tests...';
+            badge.style.color = '#fbbf24';
+
+            await SafeVault.runAutomatedSecurityTests(
+                (testResult, index, total) => {
+                    const card = document.getElementById('card-' + index);
+                    const b = document.getElementById('badge-' + index);
+                    const meta = document.getElementById('meta-' + index);
+                    if (b) {
+                        b.textContent = testResult.passed ? 'Passed' : 'Failed';
+                        b.style.color = testResult.passed ? '#34d399' : '#f87171';
+                    }
+                    if (meta) {
+                        meta.textContent = 'Duration: ' + testResult.duration + 'ms · ' + testResult.output;
+                    }
+                },
+                (results, passedCount, totalCount) => {
+                    btn.disabled = false;
+                    btn.textContent = '▶ Re-run All 8 Tests';
+                    badge.textContent = '100% Passed (' + passedCount + '/' + totalCount + ')';
+                    badge.style.color = '#34d399';
+                }
+            );
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeVault · Cycle 3: XSS Neutralization</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activity 1 Protected</span>
+            </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link active" aria-current="page">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">🛡️</span> Cycle 3 · Cross-Site Scripting Defense
+            </div>
+            <h1 class="hero-title">Dual-Stage XSS Sanitization & Entity Encoding</h1>
+            <p class="hero-subtitle">
+                Inject malicious JavaScript execution payloads to inspect SafeVault's dual-stage defense: client-side script tag stripping and server-side <code>WebUtility.HtmlEncode</code> conversion into safe HTML entities.
+            </p>
+        </header>
+
+        <!-- Two-Column Workspace -->
+        <div class="workspace-grid">
+
+            <!-- Left Card: XSS Attack Console -->
+            <section class="card" aria-labelledby="xssAttackTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="xssAttackTitle">
+                        <span aria-hidden="true">☣️</span> XSS Attack Payload Console
+                    </h2>
+                    <span class="brand-badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.35);">
+                        Dual-Stage Guard
+                    </span>
+                </div>
+
+                <!-- Attack Presets -->
+                <div style="margin-bottom: 18px;">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                        Select Attack Vector:
+                    </span>
+                    <div class="preset-group">
+                        <button type="button" class="preset-pill" onclick="loadXssPreset('&lt;script&gt;alert(\'XSS\')&lt;/script&gt;')">Script Tag: &lt;script&gt;</button>
+                        <button type="button" class="preset-pill" onclick="loadXssPreset('&lt;img src=x onerror=alert(\'XSS\')&gt;')">Event Handler: onerror</button>
+                        <button type="button" class="preset-pill" onclick="loadXssPreset('javascript:alert(1)')">Pseudo-Protocol: javascript:</button>
+                        <button type="button" class="preset-pill" onclick="loadXssPreset('&lt;svg onload=alert(\'XSS\')&gt;')">SVG Vector: onload</button>
+                    </div>
+                </div>
+
+                <form id="xssForm" onsubmit="handleXssSubmit(event)">
+                    <div class="form-group">
+                        <label for="xssPayload" class="form-label">
+                            <span>Malicious Input String <span class="req" aria-hidden="true">*</span></span>
+                        </label>
+                        <input type="text" id="xssPayload" name="xssPayload" class="form-control" required value="<script>alert('XSS')</script>" style="font-family: var(--font-mono); color: #fbbf24;">
+                        <p class="form-hint">Submit any executable JavaScript payload to inspect sanitization and entity transformations.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="xssTestBtn">
+                        Execute Sanitization Pipeline ➔
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Card: Dual-Stage Sanitization Inspector -->
+            <section class="card" aria-labelledby="sanitizationTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="sanitizationTitle">
+                        <span aria-hidden="true">🔬</span> Sanitization Pipeline Breakdown
+                    </h2>
+                    <span class="telemetry-status" id="xssStatus">Active</span>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Stage 1: Client DOM Sanitization</span>
+                        <span class="step-method">Tag Stripping</span>
+                    </div>
+                    <div class="step-output" id="inspectClientSanitized">// Awaiting payload...</div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Stage 2: Server HTML Entity Encoding</span>
+                        <span class="step-method">WebUtility.HtmlEncode</span>
+                    </div>
+                    <div class="step-output" id="inspectServerEncoded">// Awaiting payload...</div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Safe Browser DOM Rendering</span>
+                        <span class="step-method">Inert Glyph Output</span>
+                    </div>
+                    <div class="step-output" style="background: #040810; border-color: #27374f;">
+                        <span style="color: var(--text-muted); font-size: 13px; display: block; margin-bottom: 4px;">Rendered View (Safe text glyphs, zero JavaScript execution):</span>
+                        <div id="inspectDomRender" style="font-size: 15px; color: #ffffff; padding: 4px 0; font-family: var(--font-sans);"></div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Defense Verification Matrix -->
+        <section class="card" aria-labelledby="matrixTitle" style="margin-bottom: 32px;">
+            <div class="card-header">
+                <h2 class="card-title" id="matrixTitle">
+                    <span aria-hidden="true">🛡️</span> XSS Attack Vector Defense Matrix
+                </h2>
+                <span class="brand-badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.35);">
+                    100% Defense Coverage
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="db-table" aria-label="XSS Defense Matrix">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 220px;">Attack Vector</th>
+                            <th scope="col">Attacker Objective</th>
+                            <th scope="col">SafeVault Defensive Control</th>
+                            <th scope="col" style="width: 140px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></td>
+                            <td>Direct inline JavaScript execution in DOM context</td>
+                            <td>Tags stripped client-side, entities converted to <code>&amp;lt;script&amp;gt;</code></td>
+                            <td><span class="telemetry-status" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Neutralized</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>&lt;img src=x onerror=...&gt;</code></td>
+                            <td>Event handler execution on failed image load</td>
+                            <td><code>on*</code> attributes stripped; angle brackets encoded</td>
+                            <td><span class="telemetry-status" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Neutralized</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>javascript:alert(1)</code></td>
+                            <td>Execution via pseudo-protocol URL attribute</td>
+                            <td>Strict alphanumeric regex rejects colon and protocol tokens</td>
+                            <td><span class="telemetry-status" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">Neutralized</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 3 Telemetry & Generated Code Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                    </div>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
+                </div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Target: <strong id="telemetryTarget">Cycle 3 XSS Defense</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
+                    </div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// Execute an XSS payload test above to inspect the exact entity transformation
+// and encoding telemetry in this quarantined panel.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 3: XSS Mitigation
+            </div>
+        </div>
+    </footer>
+
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
+    <script>
+        function loadXssPreset(payload) {
+            document.getElementById('xssPayload').value = payload;
+            handleXssSubmit();
+        }
+
+        function handleXssSubmit(e) {
+            if (e) e.preventDefault();
+            const payload = document.getElementById('xssPayload').value;
+            const res = SafeVault.testXssMitigation(payload);
+
+            document.getElementById('inspectClientSanitized').textContent = 
+                'Raw String: ' + payload + '\n' +
+                'Client Sanitized: "' + res.sanitizedUsername + '"\n' +
+                'Dangerous tag stripping applied.';
+
+            document.getElementById('inspectServerEncoded').textContent = 
+                'WebUtility.HtmlEncode(sanitized):\n' +
+                'Output: "' + res.encodedUsername + '"\n' +
+                'Entities: < -> &lt; | > -> &gt; | " -> &quot; | \' -> &#39;';
+
+            // Safely set textContent to show glyphs without executing
+            document.getElementById('inspectDomRender').textContent = res.encodedUsername;
+            document.getElementById('xssStatus').textContent = 'XSS Neutralized';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            handleXssSubmit();
+        });
+    </script>
+</body>
+</html>

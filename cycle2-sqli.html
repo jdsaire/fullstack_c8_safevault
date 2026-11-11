@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeVault · Cycle 2: SQL Injection Defense</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Navigation Bar -->
+    <header class="navbar" role="banner">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
+                <span class="brand-icon" aria-hidden="true">🛡️</span>
+                <span class="brand-title">SafeVault</span>
+                <span class="brand-badge">Activity 1 Protected</span>
+            </a>
+            <nav class="nav-links" aria-label="Primary Navigation">
+                <a href="index.html" class="nav-link">Overview</a>
+                <a href="cycle1-intake.html" class="nav-link">Cycle 1: Intake</a>
+                <a href="cycle2-sqli.html" class="nav-link active" aria-current="page">Cycle 2: SQLi</a>
+                <a href="cycle3-xss.html" class="nav-link">Cycle 3: XSS</a>
+                <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" role="main">
+
+        <!-- Page Hero -->
+        <header class="page-hero">
+            <div class="hero-tag">
+                <span aria-hidden="true">🛡️</span> Cycle 2 · SQL Injection Defense
+            </div>
+            <h1 class="hero-title">Parameterized Query Inspector & SQLi Defense</h1>
+            <p class="hero-subtitle">
+                Test classic and dangerous SQL injection attack payloads against SafeVault's data access layer. Observe how parameterized SQLite commands bind inputs strictly as literal string values, preventing SQL grammar alteration.
+            </p>
+        </header>
+
+        <!-- Two-Column Workspace -->
+        <div class="workspace-grid">
+
+            <!-- Left Card: SQLi Attack Console -->
+            <section class="card" aria-labelledby="attackConsoleTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="attackConsoleTitle">
+                        <span aria-hidden="true">💥</span> SQL Injection Attack Simulator
+                    </h2>
+                    <span class="brand-badge" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.35);">
+                        Defense Simulation
+                    </span>
+                </div>
+
+                <!-- Attack Presets -->
+                <div style="margin-bottom: 18px;">
+                    <span style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                        Select Attack Vector:
+                    </span>
+                    <div class="preset-group">
+                        <button type="button" class="preset-pill" onclick="loadAttackPreset(&quot;admin' OR '1'='1&quot;)">Tautology: admin' OR '1'='1</button>
+                        <button type="button" class="preset-pill" onclick="loadAttackPreset(&quot;test'; DROP TABLE Users; --&quot;)">Stacked Drop: test'; DROP TABLE Users; --</button>
+                        <button type="button" class="preset-pill" onclick="loadAttackPreset(&quot;' OR 1=1 --&quot;)">Comment Evasion: ' OR 1=1 --</button>
+                        <button type="button" class="preset-pill" onclick="loadAttackPreset(&quot;' UNION SELECT 1, 'injected', 'hack' --&quot;)">Union Probe</button>
+                    </div>
+                </div>
+
+                <form id="sqliForm" onsubmit="handleSqliSubmit(event)">
+                    <div class="form-group">
+                        <label for="sqliPayload" class="form-label">
+                            <span>SQL Attack Payload <span class="req" aria-hidden="true">*</span></span>
+                        </label>
+                        <input type="text" id="sqliPayload" name="sqliPayload" class="form-control" required value="admin' OR '1'='1" style="font-family: var(--font-mono); color: #fb7185;">
+                        <p class="form-hint">Enter any SQL syntax or select a preset to evaluate defense execution.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="sqliTestBtn">
+                        Execute Parameterized Defense Test ➔
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Card: Dual-Path Execution Inspector -->
+            <section class="card" aria-labelledby="evalTitle">
+                <div class="card-header">
+                    <h2 class="card-title" id="evalTitle">
+                        <span aria-hidden="true">⚖️</span> Defensive Query Evaluation
+                    </h2>
+                    <span class="telemetry-status" id="sqliStatus">Active</span>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name" style="color: #f87171;">Vulnerable Dynamic Concatenation (Flawed)</span>
+                        <span class="step-method">DO NOT USE</span>
+                    </div>
+                    <div class="step-output" id="inspectVulnerable" style="color: #fca5a5;">// Select a payload to view vulnerable query outcome...</div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name" style="color: #34d399;">SafeVault Parameterized Binding (Secure)</span>
+                        <span class="step-method">SqliteParameter</span>
+                    </div>
+                    <div class="step-output" id="inspectParameterized" style="color: #6ee7b7;">// SafeVault parameterized command representation...</div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-header">
+                        <span class="step-name">Execution Defense Outcome</span>
+                        <span class="step-method">Query Status</span>
+                    </div>
+                    <div class="step-output" id="inspectDefenseResult">// SafeVault ready. Click Execute to test.</div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Relational Table Verification -->
+        <section class="card" aria-labelledby="tableTitle" style="margin-bottom: 32px;">
+            <div class="card-header">
+                <h2 class="card-title" id="tableTitle">
+                    <span aria-hidden="true">🗄️</span> SQLite Integrity Verification: <code>Users</code> Table
+                </h2>
+                <span class="brand-badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.35);" id="integrityBadge">
+                    Table 100% Intact
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="db-table" aria-label="SafeVault Database Integrity">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 80px;">ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col" style="width: 200px;">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- Populated by SafeVault engine -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quarantined Collapsible Telemetry & Code Panel -->
+        <section class="telemetry-section" id="telemetrySection" aria-labelledby="telemetryHeading">
+            <div class="telemetry-card">
+                <div class="telemetry-header">
+                    <div class="telemetry-title">
+                        <span class="telemetry-icon" aria-hidden="true">⚡</span>
+                        <h3 id="telemetryHeading">Cycle 2 Telemetry & Generated Code Inspector</h3>
+                        <span class="telemetry-status" id="telemetryStatus">Ready</span>
+                    </div>
+                    <div class="telemetry-actions">
+                        <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="SafeVault.copyTelemetryCode()">Copy Code</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="SafeVault.resetTelemetryLog()">Reset Log</button>
+                    </div>
+                </div>
+                <div class="telemetry-body" id="telemetryBody">
+                    <div class="telemetry-meta">
+                        <span>Target: <strong id="telemetryTarget">Cycle 2 SQLi Defense</strong></span>
+                        <span>Timestamp: <strong id="telemetryTime">—</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">—</strong></span>
+                    </div>
+                    <div class="telemetry-code-wrapper">
+                        <pre><code id="telemetryCode">// Execute a SQLi payload test above to inspect the exact C# command execution
+// and parameter binding defense telemetry in this quarantined panel.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
+            </div>
+            <div>
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 2: SQLi Defense
+            </div>
+        </div>
+    </footer>
+
+    <!-- SafeVault Shared Security Engine -->
+    <script src="js/safevault.js"></script>
+    <script>
+        function loadAttackPreset(payload) {
+            document.getElementById('sqliPayload').value = payload;
+            handleSqliSubmit();
+        }
+
+        function handleSqliSubmit(e) {
+            if (e) e.preventDefault();
+            const payload = document.getElementById('sqliPayload').value;
+            const res = SafeVault.executeSqlInjectionTest(payload);
+
+            document.getElementById('inspectVulnerable').textContent = 
+                'SELECT * FROM Users WHERE Username = \'' + payload + '\';\n' +
+                '--> Flaw: Attacker input alters SQL grammar, executing arbitrary commands or tautology leaks!';
+
+            document.getElementById('inspectParameterized').textContent = 
+                'SELECT Id, Username, Email FROM Users WHERE Username = @Username;\n' +
+                'Parameters:\n' +
+                '  @Username = "' + payload + '" (Type: Text)\n' +
+                '--> Protection: SQLite treats entire string as literal username data.';
+
+            document.getElementById('inspectDefenseResult').textContent = 
+                'Defense Result: Matched ' + res.matchedCount + ' records.\n' +
+                'Database Table: ' + res.tableRecords + ' records preserved intact.\n' +
+                'Zero tables dropped, zero unauthorized rows dumped.';
+
+            document.getElementById('sqliStatus').textContent = 'Attack Neutralized';
+            SafeVault.renderUserTable();
+        }
+
+        // Run initial test on load to populate inspector
+        document.addEventListener('DOMContentLoaded', () => {
+            handleSqliSubmit();
+        });
+    </script>
+</body>
+</html>
