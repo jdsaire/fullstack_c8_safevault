@@ -21,6 +21,11 @@ var authService = new AuthService(
     passwordHasher,
     account => authorizationService.IssueSessionToken(account)
 );
+var securityAuditService = new SecurityAuditService(
+    userRepository,
+    inputValidator,
+    authorizationService
+);
 
 // Seed baseline demonstration accounts if not present
 await SeedDefaultAccountsAsync(authService, userRepository);
@@ -30,8 +35,21 @@ builder.Services.AddSingleton(inputValidator);
 builder.Services.AddSingleton(passwordHasher);
 builder.Services.AddSingleton(authorizationService);
 builder.Services.AddSingleton(authService);
+builder.Services.AddSingleton(securityAuditService);
 
 var app = builder.Build();
+
+// Activity 3: Defensive HTTP Security Headers Middleware
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    context.Response.Headers["X-XSS-Protection"] = "0";
+    context.Response.Headers["Content-Security-Policy"] =
+        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'";
+    await next();
+});
 
 var repoRootPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "../.."));
 if (Directory.Exists(repoRootPath))
@@ -70,7 +88,7 @@ app.MapGet("/", async context =>
     }
 });
 
-// Activity 1: Secure submission endpoint with input validation and parameterized storage
+// Activity 1 & 3: Secure submission endpoint with input validation, duplicate guard, and parameterized storage
 app.MapPost("/submit", async (UserSubmission submission, InputValidator validator, UserRepository repository) =>
 {
     var validationResult = validator.ValidateAndSanitize(submission.Username, submission.Email);
@@ -86,6 +104,16 @@ app.MapPost("/submit", async (UserSubmission submission, InputValidator validato
 
     try
     {
+        var existing = await repository.GetUserAccountByUsernameAsync(validationResult.SanitizedUsername!);
+        if (existing is not null)
+        {
+            return Results.Conflict(new
+            {
+                success = false,
+                message = "Username is already registered."
+            });
+        }
+
         var userId = await repository.CreateUserAsync(
             validationResult.SanitizedUsername!,
             validationResult.SanitizedEmail!
@@ -109,9 +137,45 @@ app.MapPost("/submit", async (UserSubmission submission, InputValidator validato
     }
 });
 
-// Activity 1: Secure lookup endpoint using parameterized query
-app.MapGet("/api/users/{username}", async (string username, UserRepository repository) =>
+// Activity 3: Parameterized wildcard-safe user search endpoint
+app.MapGet("/api/users/search", async (string? q, InputValidator validator, UserRepository repository) =>
 {
+    var check = validator.ValidateSearchQuery(q);
+    if (!check.IsValid)
+    {
+        return Results.BadRequest(new SearchUsersResult(
+            IsValid: false,
+            Query: q ?? string.Empty,
+            EscapedPattern: string.Empty,
+            MatchCount: 0,
+            Matches: Array.Empty<UserRecord>(),
+            Errors: check.Errors
+        ));
+    }
+
+    var matches = await repository.SearchUsersAsync(q);
+    return Results.Ok(new SearchUsersResult(
+        IsValid: true,
+        Query: check.SanitizedQuery,
+        EscapedPattern: $"%{check.EscapedLikePattern}%",
+        MatchCount: matches.Count,
+        Matches: matches,
+        Errors: Array.Empty<string>()
+    ));
+});
+
+// Activity 1 & 3: Secure lookup endpoint with input validation and parameterized query
+app.MapGet("/api/users/{username}", async (string username, InputValidator validator, UserRepository repository) =>
+{
+    if (!validator.IsValidUsername(username))
+    {
+        return Results.BadRequest(new
+        {
+            success = false,
+            message = "Invalid username format."
+        });
+    }
+
     var user = await repository.GetUserByUsernameAsync(username);
     return user is not null ? Results.Ok(user) : Results.NotFound();
 });
@@ -235,7 +299,8 @@ app.MapGet("/api/audit/logs", (HttpContext context, AuthorizationService authz) 
         {
             new { eventId = "AUD-101", category = "Authentication", detail = "BCrypt cost=12 verification active", status = "Verified" },
             new { eventId = "AUD-102", category = "Authorization", detail = "RBAC route gate enforced on /api/admin/dashboard", status = "Enforced" },
-            new { eventId = "AUD-103", category = "DataLayer", detail = "SqliteParameter literal bindings active on Users table", status = "Protected" }
+            new { eventId = "AUD-103", category = "DataLayer", detail = "SqliteParameter literal bindings active on Users table", status = "Protected" },
+            new { eventId = "AUD-104", category = "Remediation", detail = "Activity 3 email regex, XSS, wildcard search, and token delimiter guards active", status = "Remediated" }
         }
     });
 });
@@ -265,6 +330,25 @@ app.MapGet("/api/vault/profile", async (HttpContext context, AuthorizationServic
                 account.CreatedAt
             }
     });
+});
+
+// Activity 3: Security Vulnerability Audit & Remediation Probe Endpoints
+app.MapGet("/api/security/audit", (SecurityAuditService auditService) =>
+{
+    var findings = auditService.GetVulnerabilityFindings();
+    return Results.Ok(new
+    {
+        measuredCount = findings.Count(f => f.ProvenanceBadge.Contains("[M]")),
+        simulatedCount = findings.Count(f => f.ProvenanceBadge.Contains("[SIM]")),
+        totalFindings = findings.Count,
+        findings
+    });
+});
+
+app.MapPost("/api/security/probe", async (RemediationProbeRequest request, SecurityAuditService auditService) =>
+{
+    var result = await auditService.ExecuteRemediationProbeAsync(request.VectorCategory, request.Payload);
+    return Results.Ok(result);
 });
 
 app.Run();

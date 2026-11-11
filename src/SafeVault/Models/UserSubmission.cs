@@ -103,3 +103,37 @@ public record AccessControlResult(
     string? Username,
     string? ActualRole
 );
+
+public record VulnerabilityFinding(
+    string Id,
+    string ProvenanceBadge,
+    string Category,
+    string TargetSurface,
+    string VulnerabilityDescription,
+    string RemediationApplied,
+    string VerificationTest
+);
+
+public record RemediationProbeRequest(
+    string? VectorCategory,
+    string? Payload
+);
+
+public record RemediationProbeResult(
+    string VectorCategory,
+    string RawPayload,
+    string VulnerablePattern,
+    string RemediatedPattern,
+    bool IsAttackBlocked,
+    string SanitizedOrBoundOutput,
+    string DefenseVerdict
+);
+
+public record SearchUsersResult(
+    bool IsValid,
+    string Query,
+    string EscapedPattern,
+    int MatchCount,
+    IReadOnlyList<UserRecord> Matches,
+    IReadOnlyList<string> Errors
+);

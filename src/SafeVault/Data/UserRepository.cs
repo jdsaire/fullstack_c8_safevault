@@ -1,11 +1,20 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
 using SafeVault.Models;
+using SafeVault.Services;
 
 namespace SafeVault.Data;
 
 public class UserRepository : IDisposable
 {
+    private static readonly IReadOnlyDictionary<string, string> AllowedSchemaColumns =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["PasswordHash"] = "TEXT NOT NULL DEFAULT ''",
+            ["Role"] = "TEXT NOT NULL DEFAULT 'User'",
+            ["CreatedAt"] = "TEXT NOT NULL DEFAULT ''"
+        };
+
     private readonly SqliteConnection _connection;
     private readonly bool _ownsConnection;
 
@@ -32,12 +41,14 @@ public class UserRepository : IDisposable
         command.CommandText = @"
             CREATE TABLE IF NOT EXISTS Users (
                 UserID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Username TEXT NOT NULL,
+                Username TEXT NOT NULL UNIQUE,
                 Email TEXT NOT NULL,
                 PasswordHash TEXT NOT NULL DEFAULT '',
                 Role TEXT NOT NULL DEFAULT 'User',
                 CreatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-            );";
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON Users(Username);
+            CREATE INDEX IF NOT EXISTS idx_users_role ON Users(Role);";
         command.ExecuteNonQuery();
 
         EnsureColumnExists("PasswordHash", "TEXT NOT NULL DEFAULT ''");
@@ -45,8 +56,16 @@ public class UserRepository : IDisposable
         EnsureColumnExists("CreatedAt", "TEXT NOT NULL DEFAULT ''");
     }
 
-    private void EnsureColumnExists(string columnName, string columnDefinition)
+    public void EnsureColumnExists(string columnName, string columnDefinition)
     {
+        if (string.IsNullOrWhiteSpace(columnName) ||
+            !AllowedSchemaColumns.TryGetValue(columnName, out var allowedDefinition) ||
+            !string.Equals(allowedDefinition, columnDefinition, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"Schema migration rejected: column '{columnName}' or definition is not on the static allowlist.");
+        }
+
         using var pragmaCmd = _connection.CreateCommand();
         pragmaCmd.CommandText = "PRAGMA table_info(Users);";
         using var reader = pragmaCmd.ExecuteReader();
@@ -61,7 +80,7 @@ public class UserRepository : IDisposable
         reader.Close();
 
         using var alterCmd = _connection.CreateCommand();
-        alterCmd.CommandText = $"ALTER TABLE Users ADD COLUMN {columnName} {columnDefinition};";
+        alterCmd.CommandText = $"ALTER TABLE Users ADD COLUMN {columnName} {allowedDefinition};";
         alterCmd.ExecuteNonQuery();
     }
 
@@ -135,6 +154,55 @@ public class UserRepository : IDisposable
         }
 
         return null;
+    }
+
+    public async Task<IReadOnlyList<UserRecord>> SearchUsersAsync(string? searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            return Array.Empty<UserRecord>();
+        }
+
+        foreach (var ch in searchTerm)
+        {
+            if (char.IsControl(ch))
+            {
+                return Array.Empty<UserRecord>();
+            }
+        }
+
+        var trimmed = searchTerm.Trim();
+        if (trimmed.Length > 50)
+        {
+            return Array.Empty<UserRecord>();
+        }
+
+        var escapedTerm = InputValidator.EscapeSqlLikeWildcards(trimmed);
+        var likePattern = $"%{escapedTerm}%";
+
+        var matches = new List<UserRecord>();
+        using var command = _connection.CreateCommand();
+        // Parameterized LIKE query with explicit ESCAPE '\' to prevent SQL injection and wildcard enumeration
+        command.CommandText = @"
+            SELECT UserID, Username, Email 
+            FROM Users 
+            WHERE Username LIKE @SearchPattern ESCAPE '\'
+               OR Email LIKE @SearchPattern ESCAPE '\'
+            ORDER BY UserID ASC;";
+
+        command.Parameters.AddWithValue("@SearchPattern", likePattern);
+
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            matches.Add(new UserRecord(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2)
+            ));
+        }
+
+        return matches;
     }
 
     public async Task<bool> UpdateUserRoleAsync(string username, string newRole)

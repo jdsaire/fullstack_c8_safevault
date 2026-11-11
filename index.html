@@ -15,7 +15,7 @@
             <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
                 <span class="brand-icon" aria-hidden="true">🛡️</span>
                 <span class="brand-title">SafeVault</span>
-                <span class="brand-badge">Activities 1–2 Protected</span>
+                <span class="brand-badge">Activities 1–3 Complete</span>
             </a>
             <nav class="nav-links" aria-label="Primary Navigation">
                 <a href="index.html" class="nav-link active" aria-current="page">Overview</a>
@@ -25,6 +25,7 @@
                 <a href="cycle4-tests.html" class="nav-link">Cycle 4: Tests</a>
                 <a href="cycle5-auth.html" class="nav-link">Cycle 5: Auth</a>
                 <a href="cycle6-rbac.html" class="nav-link">Cycle 6: RBAC</a>
+                <a href="cycle7-debug.html" class="nav-link">Cycle 7: Debug</a>
             </nav>
             <div class="nav-actions">
                 <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
@@ -39,10 +40,10 @@
         <div class="scope-callout" role="region" aria-label="Activity Scope Notice">
             <span style="font-size: 20px;" aria-hidden="true">🛡️</span>
             <div>
-                <strong>Activities 1 &amp; 2 Active Security Scope:</strong> SafeVault now enforces <em>Input Validation, Dual-Stage XSS Sanitization, Parameterized SQLite Queries (Activity 1)</em> alongside <em>Salted BCrypt Password Hashing, Constant-Time Login Verification, HMAC-SHA256 Session Tokens, and Role-Based Access Control (RBAC) across Admin, Auditor, and User roles (Activity 2)</em>.
+                <strong>Activities 1, 2 &amp; 3 Complete Capstone Scope:</strong> SafeVault enforces <em>Input Validation, Dual-Stage XSS Sanitization, Parameterized SQLite Queries (Activity 1)</em>, <em>Salted BCrypt Password Hashing, Constant-Time Login Verification, HMAC-SHA256 Session Tokens, and Role-Based Access Control (Activity 2)</em>, and <em>Codebase Vulnerability Remediation, Wildcard-Safe Parameterized Search, HTTP Security Headers, and the 28-Test NUnit Regression Suite (Activity 3)</em>.
                 <br>
                 <span style="color: var(--text-muted); font-size: 13.5px;">
-                    Isolation Boundary Notice: Activity 3 (Codebase Security Vulnerability Debugging Audit &amp; Criterion C6 Evaluation Summary) remains strictly isolated for the final capstone activity.
+                    Provenance Discipline: Activity 3 distinguishes <strong>4 Identified Codebase Findings (<code>[M]</code>)</strong> from <strong>2 Simulated Exercise Baselines (<code>[SIM]</code>)</strong>.
                 </span>
             </div>
         </div>
@@ -52,16 +53,16 @@
             <div class="hero-tag">
                 <span aria-hidden="true">🔒</span> Microsoft Full Stack Developer Specialization · Course 8 Capstone
             </div>
-            <h1 class="hero-title">Defensive Security, Authentication &amp; RBAC Mission Hub</h1>
+            <h1 class="hero-title">Defensive Security, Authentication, RBAC &amp; Remediation Hub</h1>
             <p class="hero-subtitle">
-                Explore SafeVault's cumulative defense-in-depth security layers across 6 dedicated full-page execution environments: input sanitization, SQL injection parameterization, XSS neutralization, salted BCrypt authentication, Role-Based Access Control (RBAC), and the 18-test NUnit verification suite.
+                Explore SafeVault's cumulative defense-in-depth security layers across 7 dedicated full-page execution environments: input sanitization, SQL injection parameterization, XSS neutralization, salted BCrypt authentication, Role-Based Access Control (RBAC), vulnerability debugging &amp; parameterized search, and the 28-test NUnit verification suite.
             </p>
         </header>
 
-        <!-- 6 Guided Mission Cards (Multipage Navigation) -->
+        <!-- 7 Guided Mission Cards (Multipage Navigation) -->
         <section aria-labelledby="missionsHeading">
             <h2 id="missionsHeading" style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">
-                Guided Execution Cycles (Activities 1 &amp; 2)
+                Guided Execution Cycles (Activities 1, 2 &amp; 3)
             </h2>
             <div class="mission-grid">
                 
@@ -116,7 +117,7 @@
                             Dissect 60-character <code>$2a$12$</code> BCrypt hashes (cost factor 12, unique 128-bit salts). Simulate valid logins, wrong passwords (<code>401</code>), constant-time anti-enumeration, and SQLi login probes.
                         </p>
                     </div>
-                    <a href="cycle5-auth.html" class="btn btn-primary btn-block">
+                    <a href="cycle5-auth.html" class="btn btn-outline btn-block">
                         Open Cycle 5: Auth ➔
                     </a>
                 </article>
@@ -130,22 +131,36 @@
                             Switch roles (<code>Admin</code>, <code>Auditor</code>, <code>User</code>, <code>Guest</code>, or tampered token) to test route gates on <code>/api/admin/dashboard</code> and <code>/api/audit/logs</code> (<code>200 OK</code> vs <code>403</code>/<code>401</code>).
                         </p>
                     </div>
-                    <a href="cycle6-rbac.html" class="btn btn-primary btn-block">
+                    <a href="cycle6-rbac.html" class="btn btn-outline btn-block">
                         Open Cycle 6: RBAC ➔
                     </a>
                 </article>
 
-                <!-- Mission Card 4 (Unified 18-Test Suite) -->
-                <article class="mission-card">
+                <!-- Mission Card 7 (Activity 3 Remediation Audit) -->
+                <article class="mission-card" style="border-color: rgba(52, 211, 153, 0.55);">
                     <div>
-                        <span class="mission-badge emerald">Cycle 4 · Unified Verification</span>
-                        <h3 class="mission-heading">18-Test Automated NUnit Suite</h3>
+                        <span class="mission-badge emerald">Cycle 7 · Activity 3 Remediation</span>
+                        <h3 class="mission-heading">Vulnerability Debugging &amp; Search Audit</h3>
                         <p class="mission-desc">
-                            Execute all 18 security &amp; RBAC unit test assertions live in-browser (mirroring <code>TestInputValidation.cs</code> and <code>TestAuthAndRbac.cs</code>) with pass/fail telemetry.
+                            Inspect before/after diffs for 4 codebase findings (<code>V1</code>–<code>V4 [M]</code>) and 2 simulated baselines (<code>S1</code>–<code>S2 [SIM]</code>), plus live wildcard-safe parameterized search (<code>LIKE @SearchPattern ESCAPE '\'</code>).
                         </p>
                     </div>
-                    <a href="cycle4-tests.html" class="btn btn-outline btn-block">
-                        Open Cycle 4: 18 Tests ➔
+                    <a href="cycle7-debug.html" class="btn btn-primary btn-block">
+                        Open Cycle 7: Debug Audit ➔
+                    </a>
+                </article>
+
+                <!-- Mission Card 4 (Unified 28-Test Suite) -->
+                <article class="mission-card" style="border-color: rgba(56, 189, 248, 0.55);">
+                    <div>
+                        <span class="mission-badge blue">Cycle 4 · Unified Verification</span>
+                        <h3 class="mission-heading">28-Test Automated NUnit Suite</h3>
+                        <p class="mission-desc">
+                            Execute all 28 security, RBAC &amp; remediation unit test assertions live in-browser (<code>TestInputValidation</code> + <code>TestAuthAndRbac</code> + <code>TestVulnerabilityRemediation</code>).
+                        </p>
+                    </div>
+                    <a href="cycle4-tests.html" class="btn btn-primary btn-block">
+                        Open Cycle 4: 28 Tests ➔
                     </a>
                 </article>
 
@@ -157,45 +172,45 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title" id="archHeading">
-                        <span aria-hidden="true">⚙️</span> Cumulative Defensive Architecture (Activities 1 &amp; 2)
+                        <span aria-hidden="true">⚙️</span> Cumulative Defensive Architecture (Activities 1, 2 &amp; 3)
                     </h2>
                     <span class="brand-badge">WCAG 2.1 AAA Compliant</span>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">1. Input Validation</h3>
+                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">1. Hardened Input &amp; Email Regex</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Enforces strict character sets (<code>^[a-zA-Z0-9_.-]+$</code>), length limits (3–50 chars), and RFC 5322 email constraints before data enters the system.
+                            Enforces strict character sets, 250ms regex timeouts, ASCII control-char rejection, and hardened email validation blocking angle brackets and quotes (<code>V1 [M]</code>).
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">2. Dual-Stage Sanitization</h3>
+                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">2. Obfuscated XSS Sanitization</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Strips client-side dangerous tags and applies server-side <code>WebUtility.HtmlEncode</code> so special characters never execute as DOM code.
+                            Strips control bytes, all <code>on[a-z0-9_]+=</code> event attributes, and whitespace-obfuscated <code>javascript:</code>/<code>vbscript:</code>/<code>data:text/html</code> URIs before <code>WebUtility.HtmlEncode</code>.
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">3. Parameterized Queries</h3>
+                        <h3 style="font-size: 16px; color: var(--color-primary); margin-bottom: 6px;">3. Parameterized Queries &amp; Search</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Zero string concatenation in SQL commands. Inputs are bound strictly as literal values via <code>SqliteParameter</code> across intake and login queries.
+                            Zero SQL string concatenation. Enforces <code>UNIQUE</code> usernames, static DDL allowlists, and wildcard-safe <code>LIKE @SearchPattern ESCAPE '\'</code> search (<code>V2 [M]</code>).
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: #c084fc; margin-bottom: 6px;">4. Salted BCrypt Hashing</h3>
+                        <h3 style="font-size: 16px; color: #c084fc; margin-bottom: 6px;">4. Salted BCrypt (Cost 4–31)</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Passwords are hashed via <code>BCrypt.Net-Next</code> (cost factor 12, unique 128-bit salts) and verified with constant-time anti-enumeration fallbacks.
+                            Hashes passwords via <code>BCrypt.Net-Next</code> (cost 12 default, standard bounds 4–31 enforced in <code>V4 [M]</code>) with constant-time anti-enumeration login checks.
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: #22d3ee; margin-bottom: 6px;">5. RBAC &amp; Signed Tokens</h3>
+                        <h3 style="font-size: 16px; color: #22d3ee; margin-bottom: 6px;">5. RBAC, Token Guards &amp; Headers</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            Enforces <code>Admin</code>, <code>Auditor</code>, and <code>User</code> role policies with HMAC-SHA256 session tokens protecting <code>/api/admin/dashboard</code> and <code>/api/audit/logs</code>.
+                            Rejects pipe (<code>|</code>) delimiter injection in HMAC session claims and emits defensive HTTP headers (<code>Content-Security-Policy</code>, <code>X-Frame-Options: DENY</code>, <code>V3 [M]</code>).
                         </p>
                     </div>
                     <div style="background: var(--bg-card-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                        <h3 style="font-size: 16px; color: var(--color-success); margin-bottom: 6px;">6. 18 NUnit Security Tests</h3>
+                        <h3 style="font-size: 16px; color: var(--color-success); margin-bottom: 6px;">6. 28 NUnit Security Tests</h3>
                         <p style="font-size: 14.5px; color: var(--text-secondary);">
-                            8 input/SQLi/XSS tests (<code>TestInputValidation</code>) + 10 BCrypt/login/RBAC tests (<code>TestAuthAndRbac</code>) verified against in-memory SQLite.
+                            8 Activity 1 tests + 10 Activity 2 tests + 10 Activity 3 remediation &amp; regression tests verified against in-memory SQLite (100% pass rate).
                         </p>
                     </div>
                 </div>
@@ -219,14 +234,14 @@
                 </div>
                 <div class="telemetry-body" id="telemetryBody">
                     <div class="telemetry-meta">
-                        <span>Status: <strong id="telemetryTarget">Mission Hub Ready (Activities 1–2)</strong></span>
+                        <span>Status: <strong id="telemetryTarget">Mission Hub Ready (Activities 1–3 Complete)</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
                         <span>Latency: <strong id="telemetryLatency">—</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// SafeVault Activities 1 &amp; 2 Multipage Architecture Active.
-// Navigate to Cycle 5 (Authentication &amp; BCrypt) or Cycle 6 (RBAC &amp; Admin Dashboard)
-// to inspect salted password hashes, HMAC session tokens, and route policy gates.</code></pre>
+                        <pre><code id="telemetryCode">// SafeVault Activities 1, 2 &amp; 3 Multipage Architecture Active.
+// Navigate to Cycle 7 (Vulnerability Debugging &amp; Search Audit) or Cycle 4 (28-Test NUnit Runner)
+// to inspect before/after remediation diffs, wildcard-safe SQLite search, and regression verification.</code></pre>
                     </div>
                 </div>
             </div>

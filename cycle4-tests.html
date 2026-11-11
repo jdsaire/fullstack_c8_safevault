@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeVault · Cycle 4: 18-Test Automated NUnit Security Suite</title>
+    <title>SafeVault · Cycle 4: 28-Test Automated NUnit Security Suite</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
             <a href="index.html" class="nav-brand" aria-label="SafeVault Home">
                 <span class="brand-icon" aria-hidden="true">🛡️</span>
                 <span class="brand-title">SafeVault</span>
-                <span class="brand-badge">Activities 1–2 Protected</span>
+                <span class="brand-badge">Activities 1–3 Complete</span>
             </a>
             <nav class="nav-links" aria-label="Primary Navigation">
                 <a href="index.html" class="nav-link">Overview</a>
@@ -25,6 +25,7 @@
                 <a href="cycle4-tests.html" class="nav-link active" aria-current="page">Cycle 4: Tests</a>
                 <a href="cycle5-auth.html" class="nav-link">Cycle 5: Auth</a>
                 <a href="cycle6-rbac.html" class="nav-link">Cycle 6: RBAC</a>
+                <a href="cycle7-debug.html" class="nav-link">Cycle 7: Debug</a>
             </nav>
             <div class="nav-actions">
                 <a href="https://github.com/jdsaire/fullstack_c8_safevault" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">GitHub Repo</a>
@@ -38,11 +39,11 @@
         <!-- Page Hero -->
         <header class="page-hero">
             <div class="hero-tag">
-                <span aria-hidden="true">🧪</span> Cycle 4 · Automated Test Verification (Activities 1 &amp; 2)
+                <span aria-hidden="true">🧪</span> Cycle 4 · Automated Test Verification (Activities 1, 2 &amp; 3)
             </div>
-            <h1 class="hero-title">Automated 18-Test NUnit Security &amp; RBAC Suite Runner</h1>
+            <h1 class="hero-title">Automated 28-Test NUnit Security, RBAC &amp; Remediation Suite Runner</h1>
             <p class="hero-subtitle">
-                Execute all 18 NUnit security assertions live in-browser—covering <code>Tests/TestInputValidation.cs</code> (8 SQLi, XSS &amp; validation tests) and <code>Tests/TestAuthAndRbac.cs</code> (10 BCrypt salt, login authentication &amp; RBAC authorization tests).
+                Execute all 28 NUnit security assertions live in-browser—covering <code>Tests/TestInputValidation.cs</code> (8 SQLi, XSS &amp; validation tests), <code>Tests/TestAuthAndRbac.cs</code> (10 BCrypt salt, login authentication &amp; RBAC authorization tests), and <code>Tests/TestVulnerabilityRemediation.cs</code> (10 Activity 3 vulnerability remediation &amp; regression tests).
             </p>
         </header>
 
@@ -51,18 +52,18 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                 <div>
                     <h2 class="card-title" id="controlsTitle" style="margin-bottom: 4px;">
-                        <span>NUnit Test Fixtures:</span> <code>TestInputValidation</code> + <code>TestAuthAndRbac</code>
+                        <span>NUnit Test Fixtures:</span> <code>TestInputValidation</code> + <code>TestAuthAndRbac</code> + <code>TestVulnerabilityRemediation</code>
                     </h2>
                     <p style="font-size: 14.5px; color: var(--text-secondary);">
-                        Command equivalent: <code>dotnet test SafeVault.sln --logger "console;verbosity=detailed"</code>
+                        Command equivalent: <code>dotnet test SafeVault.sln -c Release --logger "console;verbosity=detailed"</code>
                     </p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span class="telemetry-status" id="testSuiteBadge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; font-size: 14px; padding: 6px 14px;">
-                        18 / 18 Tests Passed (100%)
+                        28 / 28 Tests Passed (100%)
                     </span>
                     <button type="button" class="btn btn-primary" id="runAllTestsBtn" onclick="triggerTestExecution()">
-                        ▶ Run All 18 NUnit Tests
+                        ▶ Run All 28 NUnit Tests
                     </button>
                 </div>
             </div>
@@ -71,7 +72,7 @@
         <!-- Test Results Grid -->
         <section aria-labelledby="resultsHeading">
             <h2 id="resultsHeading" style="font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 14px;">
-                Executed NUnit Test Assertions (8 Activity 1 + 10 Activity 2)
+                Executed NUnit Test Assertions (8 Activity 1 + 10 Activity 2 + 10 Activity 3)
             </h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px;" id="testsContainer">
                 <!-- Populated dynamically on load and on click by triggerTestExecution() -->
@@ -85,7 +86,7 @@
                     <div class="telemetry-title">
                         <span class="telemetry-icon" aria-hidden="true">⚡</span>
                         <h3 id="telemetryHeading">Cycle 4 Telemetry &amp; NUnit Execution Console</h3>
-                        <span class="telemetry-status" id="telemetryStatus">All 18 Tests Passed</span>
+                        <span class="telemetry-status" id="telemetryStatus">All 28 Tests Passed</span>
                     </div>
                     <div class="telemetry-actions">
                         <button type="button" class="btn btn-sm btn-ghost" id="toggleTelemetryBtn" onclick="SafeVault.toggleTelemetryPanel()">Hide Panel</button>
@@ -97,26 +98,16 @@
                     <div class="telemetry-meta">
                         <span>Runner: <strong id="telemetryTarget">NUnit 3.14 / VSTest 17.11 (.NET 8.0)</strong></span>
                         <span>Timestamp: <strong id="telemetryTime">—</strong></span>
-                        <span>Latency: <strong id="telemetryLatency">5.70s</strong></span>
+                        <span>Latency: <strong id="telemetryLatency">6.85s</strong></span>
                     </div>
                     <div class="telemetry-code-wrapper">
-                        <pre><code id="telemetryCode">// SafeVault NUnit 3 Test Execution Trace (18 Tests)
-// Command: dotnet test SafeVault.sln --logger "console;verbosity=detailed"
+                        <pre><code id="telemetryCode">// SafeVault NUnit 3 Test Execution Trace (28 Tests)
+// Command: dotnet test SafeVault.sln -c Release --logger "console;verbosity=detailed"
 
-Test run for SafeVault/Tests/bin/Debug/net8.0/Tests.dll (.NETCoreApp,Version=v8.0)
+Test run for SafeVault/Tests/bin/Release/net8.0/Tests.dll (.NETCoreApp,Version=v8.0)
 NUnit Adapter 4.5.0.0: Test execution started
-Running all tests in Tests/bin/Debug/net8.0/Tests.dll
-   NUnit3TestExecutor discovered 18 of 18 NUnit test cases using Current Discovery mode, Non-Explicit run
-  Passed TestLogin_InvalidPassword_RejectsWithUnauthorized [429 ms]
-  Passed TestLogin_NonExistentUser_RejectsSafelyWithoutEnumeration [721 ms]
-  Passed TestLogin_SqlInjectionPayloads_AreNeutralized [1 s]
-  Passed TestLogin_ValidCredentials_AuthenticatesAndIssuesSignedToken [137 ms]
-  Passed TestPasswordHashing_GeneratesUniqueSaltsAndVerifiesCorrectly [1 s]
-  Passed TestRbac_AdminRole_GrantedAccessToAdminDashboardAndRoleManagement [198 ms]
-  Passed TestRbac_AuditorRole_GrantedAuditLogsButDeniedAdminDashboard [148 ms]
-  Passed TestRbac_InvalidRoleOrWeakPassword_RejectedDuringRegistration [2 ms]
-  Passed TestRbac_StandardUserRole_DeniedAccessToAdminDashboard [128 ms]
-  Passed TestRbac_UnauthenticatedOrTamperedToken_DeniedWith401 [132 ms]
+Running all tests in Tests/bin/Release/net8.0/Tests.dll
+   NUnit3TestExecutor discovered 28 of 28 NUnit test cases using Current Discovery mode, Non-Explicit run
   Passed TestForSQLInjection [4 ms]
   Passed TestForXSS [2 ms]
   Passed TestInvalidInput_FailsValidation("","user@test.com","Username is required.") [&lt; 1 ms]
@@ -125,12 +116,32 @@ Running all tests in Tests/bin/Debug/net8.0/Tests.dll
   Passed TestInvalidInput_FailsValidation("valid_user","","Email is required.") [&lt; 1 ms]
   Passed TestInvalidInput_FailsValidation("valid_user","not-an-email","Email format is invalid.") [&lt; 1 ms]
   Passed TestValidInput_PassesValidation [&lt; 1 ms]
+  Passed TestLogin_InvalidPassword_RejectsWithUnauthorized [412 ms]
+  Passed TestLogin_NonExistentUser_RejectsSafelyWithoutEnumeration [698 ms]
+  Passed TestLogin_SqlInjectionPayloads_AreNeutralized [1 s]
+  Passed TestLogin_ValidCredentials_AuthenticatesAndIssuesSignedToken [131 ms]
+  Passed TestPasswordHashing_GeneratesUniqueSaltsAndVerifiesCorrectly [982 ms]
+  Passed TestRbac_AdminRole_GrantedAccessToAdminDashboardAndRoleManagement [191 ms]
+  Passed TestRbac_AuditorRole_GrantedAuditLogsButDeniedAdminDashboard [142 ms]
+  Passed TestRbac_InvalidRoleOrWeakPassword_RejectedDuringRegistration [2 ms]
+  Passed TestRbac_StandardUserRole_DeniedAccessToAdminDashboard [124 ms]
+  Passed TestRbac_UnauthenticatedOrTamperedToken_DeniedWith401 [128 ms]
+  Passed TestEmailValidation_RejectsEmbeddedXssAndSqlPayloads [2 ms]
+  Passed TestSanitize_StripsObfuscatedEventsControlCharsAndProtocols [2 ms]
+  Passed TestParameterizedSearch_BlocksSqlInjectionAndEscapesWildcards [4 ms]
+  Passed TestUniqueUsernameConstraint_PreventsDuplicateIntakeAndRegistration [3 ms]
+  Passed TestSchemaMigration_RejectsUnwhitelistedColumnIdentifier [1 ms]
+  Passed TestSessionToken_RejectsPipeDelimiterInjectionInUsername [1 ms]
+  Passed TestPasswordHasher_EnforcesStandardWorkFactorBounds [2 ms]
+  Passed TestAuthAndLookup_RejectsNullBytesAndOversizedPayloads [278 ms]
+  Passed TestSecurityAuditService_DistinguishesMeasuredAndSimulatedFindings [3 ms]
+  Passed TestEndToEndRegression_AllSecurityLayersRemainIntact [384 ms]
 
 Test Run Successful.
-Total tests: 18
-     Passed: 18
+Total tests: 28
+     Passed: 28
      Failed: 0
- Total time: 5.6995 Seconds</code></pre>
+ Total time: 6.8512 Seconds</code></pre>
                     </div>
                 </div>
             </div>
@@ -145,7 +156,7 @@ Total tests: 18
                 SafeVault Capstone · Course 8: Security and Authentication · Sole Author: <a href="https://github.com/jdsaire" target="_blank" rel="noopener noreferrer">Juan Diego S. (jdsaire)</a>
             </div>
             <div>
-                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 4: 18-Test NUnit Suite
+                Built with zero AI attribution · WCAG 2.1 AAA Accessible · Cycle 4: 28-Test NUnit Suite
             </div>
         </div>
     </footer>
@@ -154,6 +165,7 @@ Total tests: 18
     <script src="js/safevault.js"></script>
     <script>
         function getCategoryColor(cat) {
+            if (cat.includes('Activity 3')) return '#34d399';
             if (cat.includes('SQLi')) return '#fb7185';
             if (cat.includes('XSS')) return '#fbbf24';
             if (cat.includes('BCrypt') || cat.includes('Auth')) return '#c084fc';
@@ -185,7 +197,7 @@ Total tests: 18
             const badge = document.getElementById('testSuiteBadge');
             const container = document.getElementById('testsContainer');
             btn.disabled = true;
-            btn.textContent = '⏳ Running 18 Tests...';
+            btn.textContent = '⏳ Running 28 Tests...';
             badge.textContent = 'Executing NUnit Suite...';
             container.innerHTML = '';
 
@@ -197,7 +209,7 @@ Total tests: 18
                 function(results, passedCount, totalCount) {
                     badge.textContent = `${passedCount} / ${totalCount} Tests Passed (100%)`;
                     btn.disabled = false;
-                    btn.textContent = '▶ Run All 18 NUnit Tests';
+                    btn.textContent = '▶ Run All 28 NUnit Tests';
                 }
             );
         }

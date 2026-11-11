@@ -5,8 +5,8 @@ namespace SafeVault.Services;
 public class PasswordHasher
 {
     public const int DefaultWorkFactor = 12;
-    private const int MinWorkFactor = 4;
-    private const int MaxWorkFactor = 16;
+    public const int MinWorkFactor = 4;
+    public const int MaxWorkFactor = 31;
 
     // Precomputed dummy hash used for constant-time fallback when a username does not exist
     private static readonly string DummyHash =
