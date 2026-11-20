@@ -24,7 +24,7 @@ Each Activity Completion Report follows a consistent nine-section structure:
 - **6. Component Architecture**: Breakdown of backend services, data repositories, test fixtures, and frontend workspaces.
 - **7. Scope Boundaries**: Explicit demarcation between the completed activity and subsequent capstone activities.
 - **8. Artifact & Verification Audit Ledger**: Audit ledger of commits, pull requests, build/test verifications (`[M]`), and interactive demo surfaces (`[SIM]`).
-- **9. Author & AI Assistance Disclosure Attestation**: Sole authorship attestation (`jdsaire`) and generic disclosure of how an AI environment assisted during the activity.
+- **9. Author & Tooling Disclosure Attestation**: Sole authorship attestation (`jdsaire`) and transparent disclosure of how Antigravity assisted as the sole end-to-end tooling platform during the activity.
 
 ---
 
@@ -33,5 +33,6 @@ Each Activity Completion Report follows a consistent nine-section structure:
 | Activity ID | Title | Code Status | Pull Requests | Author | Date | Report Link |
 |---|---|---|---|---|---|---|
 | **C8-ACT1** | Input Validation, Parameterized Queries & Multipage Architecture | Completed on `main` (`eb99ab5`) | [#1](https://github.com/jdsaire/fullstack_c8_safevault/pull/1), [#2](https://github.com/jdsaire/fullstack_c8_safevault/pull/2), [#3](https://github.com/jdsaire/fullstack_c8_safevault/pull/3) | Juan Diego S. | Nov 2026 | [ACTIVITY-1-COMPLETION-REPORT.md](ACTIVITY-1-COMPLETION-REPORT.md) |
-| **C8-ACT3** | Security Debugging, Vulnerability Remediation & Capstone Summary | Completed on `main` (`c670798`) | [#5](https://github.com/jdsaire/fullstack_c8_safevault/pull/5), [#6](https://github.com/jdsaire/fullstack_c8_safevault/pull/6), [#7](https://github.com/jdsaire/fullstack_c8_safevault/pull/7) | Juan Diego S. | Nov 2026 | [ACTIVITY-3-COMPLETION-REPORT.md](ACTIVITY-3-COMPLETION-REPORT.md) |
+| **C8-ACT2** | Authentication & Role-Based Access Control (RBAC) | Completed on `main` (`feedc6a`) | [#4](https://github.com/jdsaire/fullstack_c8_safevault/pull/4) | Juan Diego S. | Nov 2026 | [ACTIVITY-2-COMPLETION-REPORT.md](ACTIVITY-2-COMPLETION-REPORT.md) |
+| **C8-ACT3** | Security Debugging, Vulnerability Remediation & Capstone Summary | Completed on `main` (`a00c195`) | [#5](https://github.com/jdsaire/fullstack_c8_safevault/pull/5), [#6](https://github.com/jdsaire/fullstack_c8_safevault/pull/6), [#7](https://github.com/jdsaire/fullstack_c8_safevault/pull/7), [#8](https://github.com/jdsaire/fullstack_c8_safevault/pull/8) | Juan Diego S. | Nov 2026 | [ACTIVITY-3-COMPLETION-REPORT.md](ACTIVITY-3-COMPLETION-REPORT.md) |
 

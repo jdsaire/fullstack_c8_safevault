@@ -222,8 +222,8 @@ fullstack_c8_safevault/
 
 ---
 
-## 9. Author & AI Assistance Disclosure Attestation
+## 9. Author & Tooling Disclosure Attestation
 
 - **Sole Author**: Juan Diego S. (`88201583+jdsaire@users.noreply.github.com`).
-- **AI Assistance Summary (Criteria C3 & C5)**: As documented in [`README.md`](../../README.md), an AI environment assisted in implementing salted BCrypt password hashing ([`src/SafeVault/Services/PasswordHasher.cs`](../../src/SafeVault/Services/PasswordHasher.cs)), constant-time authentication with anti-enumeration ([`src/SafeVault/Services/AuthService.cs`](../../src/SafeVault/Services/AuthService.cs)), HMAC-SHA256 bearer token issuance and RBAC route enforcement ([`src/SafeVault/Services/AuthorizationService.cs`](../../src/SafeVault/Services/AuthorizationService.cs)), and the 10 NUnit security tests in [`Tests/TestAuthAndRbac.cs`](../../Tests/TestAuthAndRbac.cs).
+- **End-to-End Tooling Summary (Criteria C3 & C5)**: As documented in [`README.md`](../../README.md) and [`REFLECTION.md`](../../REFLECTION.md), **Antigravity** was used as the sole end-to-end tooling platform to assist in implementing salted BCrypt password hashing ([`src/SafeVault/Services/PasswordHasher.cs`](../../src/SafeVault/Services/PasswordHasher.cs)), constant-time authentication with anti-enumeration ([`src/SafeVault/Services/AuthService.cs`](../../src/SafeVault/Services/AuthService.cs)), HMAC-SHA256 bearer token issuance and RBAC route enforcement ([`src/SafeVault/Services/AuthorizationService.cs`](../../src/SafeVault/Services/AuthorizationService.cs)), and the 10 NUnit security tests in [`Tests/TestAuthAndRbac.cs`](../../Tests/TestAuthAndRbac.cs).
 - **Build & Test Verification**: All Activity 2 code compiled with `0` warnings and `0` errors under the `.NET 8.0` SDK (`[M]`).
